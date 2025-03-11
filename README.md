@@ -1,8 +1,7 @@
-# Report Example
+# morecycles
 
-See [report.pdf](report.pdf) for documentation.
+new functions for TidalCycles pattern manipulation
 
-Note: To rename the project you need to replace all occurrences of "report" with your own library name in the following files:
+## documentation
 
-- `hie.yaml`
-- `package.yaml`
+see [morecycles.pdf](morecycles.pdf)

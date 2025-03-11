@@ -1,7 +1,7 @@
-name: report
+name: morecycles
 version: 0.1.0.0
 synopsis: My Haskell project
-description: See report.pdf
+description: See morecycles.pdf
 maintainer: My Name <my.email@example.com>
 category: Logic
 
@@ -26,13 +26,13 @@ executables:
     main: Main.lhs
     source-dirs: exec
     dependencies:
-      - report
+      - morecycles
 
 tests:
   simpletests:
     main: simpletests.lhs
     source-dirs: test
     dependencies:
-      - report
+      - morecycles
       - QuickCheck
       - hspec

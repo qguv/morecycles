@@ -1,13 +1,13 @@
 cradle:
   stack:
     - path: "./lib"
-      component: "report:lib"
+      component: "morecycles:lib"
 
     - path: "./exec/Main.lhs"
-      component: "report:exe:myprogram"
+      component: "morecycles:exe:myprogram"
 
-    - path: "./exec/Paths_report.hs"
-      component: "report:exe:myprogram"
+    - path: "./exec/Paths_morecycles.hs"
+      component: "morecycles:exe:myprogram"
 
     - path: "./test"
-      component: "report:test:simpletests"
+      component: "morecycles:test:simpletests"
