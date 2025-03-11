@@ -17,6 +17,7 @@ dependencies:
   - parsec
   - random
   - template-haskell
+  - tidal
 
 library:
   source-dirs: lib
