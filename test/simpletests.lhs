@@ -9,6 +9,7 @@ and test some properties.
 module Main where
 
 import Basics
+import Jumble
 
 import Test.Hspec
 import Test.QuickCheck
@@ -28,6 +29,10 @@ main = hspec $ do
       property (\n -> n > 0 ==> funnyfunction n > 0)
     it "myreverse: using it twice gives back the same list" $
       property $ \str -> myreverse (myreverse str) == (str::String)
+
+  describe "Jumble" $ do
+    it "jumble' 0 shouldn't change the pattern" $
+      property $ \mp -> \p -> jumble' 0 mp p == p
 \end{code}
 
 To run the tests, use \verb|stack test|.
