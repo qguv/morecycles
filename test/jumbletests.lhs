@@ -4,35 +4,40 @@
 module Main where
 
 import Jumble
+import TestUtils
+
+
+import Sound.Tidal.Pattern
+import Sound.Tidal.Core
+import Sound.Tidal.Show
 
 import Test.Hspec
 import Test.QuickCheck
-
-import Sound.Tidal.Pattern
+import Numeric.Natural
 \end{code}
 
 First, we need to describe how to create arbitrary \texttt{Pattern} instances:
 
 \begin{code}
-{-
-instance Arbitrary Pattern a where
+instance (Arbitrary a) => Arbitrary (Pattern a) where
   arbitrary = sized $ m where
-    m 0 = pure $ listToPattern [arbitrary]
-    m 1 = pure $ listToPattern [arbitrary, arbitrary]
-    m n = pure $ listToPattern [resize (n//2) arbitrary, resize (n//2) arbitrary]
--}
+    m n | n < 4 = listToPat <$> (:[]) <$> arbitrary
+    m n = fastCat <$> oneof [ sequence [resize (n `div` 2) arbitrary, resize (n `div` 2) arbitrary]
+      , sequence [resize (n `div` 2) arbitrary, resize (n `div` 2) arbitrary, resize (n `div` 2) arbitrary]
+      , sequence [resize (n `div` 2) arbitrary, resize (n `div` 2) arbitrary, resize (n `div` 2) arbitrary, resize (n `div` 2) arbitrary] ]
 \end{code}
 
 We can now define our tests:
 
 \begin{code}
-{-
+
 main :: IO ()
 main = hspec $ do
   describe "Jumble" $ do
     it "jumble' 0 shouldn't change the pattern" $
-      property $ \mp -> \p -> jumble' 0 mp p == p
+      property $ \mp -> \p -> compareP (Arc 0 8) (jumble' 0 mp p) (p :: Pattern Bool)
+    {-
     it "jumble' shouldn't change the pattern if the whole pattern is masked" $
-      property $ \i -> \p -> jumble' i (listToPattern [true]) p == p
--}
+      property $ \i -> \p -> compareP (Arc 0 8) (jumble' i (listToPat [True]) p) (p :: Pattern Bool)
+    -}
 \end{code}
