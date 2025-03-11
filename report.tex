@@ -1,20 +1,17 @@
 \documentclass[12pt,a4paper]{article}
 \input{latexmacros.tex}
 
-\title{My Report}
-\author{Me}
+\title{morecycles}
+\author{Quint Guvernator, Debdutta Guha Roy, Kaustav Kumar Choudhury, Jay Warnock, Gideon Pol, Milan La Rivière}
 \date{\today}
-\hypersetup{pdfauthor={Me}, pdftitle={My Report}}
+\hypersetup{pdfauthor={Quint Guvernator, Debdutta Guha Roy, Kaustav Kumar Choudhury, Jay Warnock, Gideon Pol, Milan La Rivière}, pdftitle={morecycles}}
 
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-We give a toy example of a report in \emph{literate programming} style.
-The main advantage of this is that source code and documentation can
-be written and presented next to each other.
-We use the listings package to typeset Haskell source code nicely.
+    This paper describes the design and implementation of pattern manipulation (or generation) functions for TidalCycles that have musical value but aren't (yet) part of TidalCycles.
 \end{abstract}
 
 \vfill
@@ -23,16 +20,15 @@ We use the listings package to typeset Haskell source code nicely.
 
 \clearpage
 
-% We include one file for each section. The ones containing code should
-% be called something.lhs and also mentioned in the .cabal file.
-
 \input{Howto.tex}
 
-\input{lib/Basics.lhs}
+\input{About.tex}
 
-\input{exec/Main.lhs}
+\section{Functions}
 
-\input{test/simpletests.lhs}
+\input{lib/Jumble.lhs}
+
+\input{test/jumbletests.lhs}
 
 \input{Conclusion.tex}
 

@@ -3,11 +3,5 @@ cradle:
     - path: "./lib"
       component: "morecycles:lib"
 
-    - path: "./exec/Main.lhs"
-      component: "morecycles:exe:myprogram"
-
-    - path: "./exec/Paths_morecycles.hs"
-      component: "morecycles:exe:myprogram"
-
     - path: "./test"
-      component: "morecycles:test:simpletests"
+      component: "morecycles:test:jumbletests"

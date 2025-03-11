@@ -1,9 +1,9 @@
 name: morecycles
 version: 0.1.0.0
-synopsis: My Haskell project
+synopsis: Pattern manipulation (or generation) functions for TidalCycles that have musical value but aren't (yet) part of TidalCycles
 description: See morecycles.pdf
-maintainer: My Name <my.email@example.com>
-category: Logic
+maintainer: Quint Guvernator <quint@guvernator.net>
+category: Music
 
 ghc-options: -Wall
 
@@ -22,18 +22,12 @@ dependencies:
 library:
   source-dirs: lib
 
-executables:
-  myprogram:
-    main: Main.lhs
-    source-dirs: exec
-    dependencies:
-      - morecycles
-
 tests:
-  simpletests:
-    main: simpletests.lhs
+  jumbletests:
+    main: jumbletests.lhs
     source-dirs: test
     dependencies:
       - morecycles
       - QuickCheck
       - hspec
+      - tidal
