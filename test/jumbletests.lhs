@@ -6,14 +6,12 @@ module Main where
 import Jumble
 import TestUtils
 
-
 import Sound.Tidal.Pattern
 import Sound.Tidal.Core
 import Sound.Tidal.Show
 
 import Test.Hspec
 import Test.QuickCheck
-import Numeric.Natural
 \end{code}
 
 First, we need to describe how to create arbitrary \texttt{Pattern} instances:
