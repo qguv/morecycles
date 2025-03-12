@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-orphans #-}
 \subsubsection{Tests}
 
 \begin{code}
@@ -8,7 +9,6 @@ import TestUtils
 
 import Sound.Tidal.Pattern
 import Sound.Tidal.Core
-import Sound.Tidal.Show
 
 import Test.Hspec
 import Test.QuickCheck
@@ -18,8 +18,8 @@ First, we need to describe how to create arbitrary \texttt{Pattern} instances:
 
 \begin{code}
 instance (Arbitrary a) => Arbitrary (Pattern a) where
-  arbitrary = sized $ m where
-    m n | n < 4 = listToPat <$> (:[]) <$> arbitrary
+  arbitrary = sized m where
+    m n | n < 4 = listToPat . (:[]) <$> arbitrary
     m n = fastCat <$> oneof [ sequence [resize (n `div` 2) arbitrary, resize (n `div` 2) arbitrary]
       , sequence [resize (n `div` 2) arbitrary, resize (n `div` 2) arbitrary, resize (n `div` 2) arbitrary]
       , sequence [resize (n `div` 2) arbitrary, resize (n `div` 2) arbitrary, resize (n `div` 2) arbitrary, resize (n `div` 2) arbitrary] ]
