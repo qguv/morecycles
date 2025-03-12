@@ -13,6 +13,8 @@ We call this function \texttt{jumble}.
 module Jumble where
 
 import Sound.Tidal.Pattern
+import Sound.Tidal.UI
+import Sound.Tidal.Core
 \end{code}
 
 \texttt{jumble} takes two patterns as input:
@@ -22,7 +24,7 @@ This is similar to the signature of the `mask` function.
 
 The function produces as output a pattern where
 any event which overlaps with a 1 in the mask pattern is passed through undisturbed,
-and all the other events are chopped up and shuffled.
+and the values at the other events are rotated.
 The smallest "empty space" becomes the granularity at which the unmasked events are chopped.
 
 To implement this non-deterministic function,
@@ -33,7 +35,30 @@ where the permutation index is given explicitly as a parameter:
 -- deterministic version of jumble, which takes a permutation index
 jumble' :: Int -> Pattern Bool -> Pattern a -> Pattern a
 jumble' 0 _ p = p
-jumble' _n _mp _p = undefined -- FIXME
+jumble' i mp p = stack [static, variable] where
+  static = mask mp p
+  variable = rotateValues $ mask (inv mp) p
+
+  -- rotate a list (head to last) a certain number of times
+  rot8 :: Int -> [a] -> [a]
+  rot8 0 xs = xs
+  rot8 _ [] = []
+  rot8 n (x:xs) = rot8 (n-1) (xs ++ [x])
+
+  -- extract values from an event
+  getValue :: Event a -> a
+  getValue (Event _ _ _ v) = v
+
+  -- rotate the values of an event
+  rotateValues Pattern{query=oldQuery} = Pattern{query=newQuery} where
+    newQuery state = inject (rot8 i values) events where
+      events = oldQuery state
+      values = getValue <$> events
+
+      -- swap out the value in each event with values from a list
+      inject :: [a] -> [Event b] -> [Event a]
+      inject (v:vs) (e:es) = e{value=v} : inject vs es
+      inject _ _ = []
 \end{code}
 
 Using this definition, we can create a non-deterministic version by choosing a permutation index randomly:
@@ -41,5 +66,6 @@ Using this definition, we can create a non-deterministic version by choosing a p
 \begin{code}
 -- non-deterministic version of jumble, which randomly chooses a new permutation each cycle
 jumble :: Pattern Bool -> Pattern a -> Pattern a
-jumble = undefined -- FIXME
+jumble _mp _p = Pattern{query=newQuery} where
+  newQuery _state = undefined -- choose [jumble' i mp p | i <- [0..length (query p state)-1]] -- TODO
 \end{code}

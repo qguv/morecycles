@@ -32,10 +32,19 @@ We can now define our tests:
 main :: IO ()
 main = hspec $ do
   describe "Jumble" $ do
-    it "jumble' 0 shouldn't change the pattern" $
-      property $ \mp -> \p -> compareP (Arc 0 8) (jumble' 0 mp p) (p :: Pattern Bool)
-    {-
-    it "jumble' shouldn't change the pattern if the whole pattern is masked" $
-      property $ \i -> \p -> compareP (Arc 0 8) (jumble' i (listToPat [True]) p) (p :: Pattern Bool)
-    -}
+
+    it "shouldn't change the pattern when the permutation index is zero" $
+      property $ \mp p -> compareP (Arc 0 8) (jumble' 0 mp p) (p :: Pattern Int)
+
+    it "shouldn't change the pattern when the whole pattern is masked" $
+      property $ \i p -> compareP (Arc 0 1) (jumble' i (listToPat [True]) p) (p :: Pattern Int)
+
+    it "should change the pattern if nothing is masked" $
+      compareP (Arc 0 8) (jumble' 1 (listToPat [False]) (listToPat [0, 1])) (listToPat [1, 0 :: Int])
+
+    it "should change the pattern with a complex mask" $
+      compareP (Arc 0 1) (jumble' 1 (listToPat [True, False, True, False]) (listToPat [1, 2, 3, 4])) (listToPat [1, 4, 3, 2 :: Int])
+
+    it "shouldn't change the pattern when the permutation index loops around" $
+      compareP (Arc 0 1) (jumble' 2 (listToPat [True, False, True, False]) (listToPat [1, 2, 3, 4])) (listToPat [1, 2, 3, 4 :: Int])
 \end{code}
