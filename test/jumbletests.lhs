@@ -9,6 +9,7 @@ import TestUtils
 
 import Sound.Tidal.Pattern
 import Sound.Tidal.Core
+import Sound.Tidal.ParseBP
 
 import Test.Hspec
 import Test.QuickCheck
@@ -37,13 +38,13 @@ main = hspec $ do
       property $ \mp p -> compareP (Arc 0 8) (jumble' 0 mp p) (p :: Pattern Int)
 
     it "shouldn't change the pattern when the whole pattern is masked" $
-      property $ \i p -> compareP (Arc 0 1) (jumble' i (listToPat [True]) p) (p :: Pattern Int)
+      property $ \i p -> compareP (Arc 0 1) (jumble' i (parseBP_E "[1]") p) (p :: Pattern Int)
 
     it "should change the pattern if nothing is masked" $
-      compareP (Arc 0 8) (jumble' 1 (listToPat [False]) (listToPat [0, 1])) (listToPat [1, 0 :: Int])
+      compareP (Arc 0 8) (jumble' 1 (parseBP_E "[0]") (parseBP_E "[a b]")) (parseBP_E "[b a]" :: Pattern String)
 
-    it "should change the pattern with a complex mask" $
-      compareP (Arc 0 1) (jumble' 1 (listToPat [True, False, True, False]) (listToPat [1, 2, 3, 4])) (listToPat [1, 4, 3, 2 :: Int])
+    it "should change the pattern with a complex mask 1" $
+      compareP (Arc 0 1) (jumble' 1 (parseBP_E "[1 0 1 0]") (parseBP_E "[a b c d]")) (parseBP_E "[a d c b]" :: Pattern String)
 
     it "shouldn't change the pattern when the permutation index loops around" $
       compareP (Arc 0 1) (jumble' 2 (listToPat [True, False, True, False]) (listToPat [1, 2, 3, 4])) (listToPat [1, 2, 3, 4 :: Int])
