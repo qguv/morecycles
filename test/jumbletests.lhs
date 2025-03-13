@@ -46,6 +46,15 @@ main = hspec $ do
     it "should change the pattern with a complex mask 1" $
       compareP (Arc 0 1) (jumble' 1 (parseBP_E "[1 0 1 0]") (parseBP_E "[a b c d]")) (parseBP_E "[a d c b]" :: Pattern String)
 
+    it "should change the pattern with a complex mask 2" $
+      compareP (Arc 0 1) (jumble' 1 (parseBP_E "[1 0]") (parseBP_E "[a b c d]")) (parseBP_E "[a b d c]" :: Pattern String)
+
+    it "should change the pattern with a complex mask 3" $
+      compareP (Arc 0 1) (jumble' 1 (parseBP_E "[0 [1 0]]") (parseBP_E "[a b c d]")) (parseBP_E "[b d c a]" :: Pattern String)
+
+    it "should change the pattern with a complex mask 4" $
+      compareP (Arc 0 1) (jumble' 1 (parseBP_E "[1 0 1 0]") (parseBP_E "[bd [hh cp] sd cp]")) (parseBP_E "[bd [cp cp] sd hh]" :: Pattern String)
+
     it "shouldn't change the pattern when the permutation index loops around" $
       compareP (Arc 0 1) (jumble' 2 (listToPat [True, False, True, False]) (listToPat [1, 2, 3, 4])) (listToPat [1, 2, 3, 4 :: Int])
 \end{code}
