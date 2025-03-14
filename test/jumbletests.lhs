@@ -35,26 +35,26 @@ main = hspec $ do
   describe "Jumble" $ do
 
     it "shouldn't change the pattern when the permutation index is zero" $
-      property $ \mp p -> compareP (Arc 0 8) (jumble' 0 mp p) (p :: Pattern Int)
+      property $ \t1 t2 mp p -> compareP (Arc (min t1 t2) (max t1 t2)) (jumble' 0 mp p) (p :: Pattern Int)
 
     it "shouldn't change the pattern when the whole pattern is masked" $
-      property $ \i p -> compareP (Arc 0 1) (jumble' i (parseBP_E "[1]") p) (p :: Pattern Int)
+      property $ \t1 t2 i p -> compareP (Arc (min t1 t2) (max t1 t2)) (jumble' i (parseBP_E "[1]") p) (p :: Pattern Int)
 
     it "should change the pattern if nothing is masked" $
-      compareP (Arc 0 8) (jumble' 1 (parseBP_E "[0]") (parseBP_E "[a b]")) (parseBP_E "[b a]" :: Pattern String)
+      property $ \t1 t2 -> compareP (Arc (min t1 t2) (max t1 t2)) (jumble' 1 (parseBP_E "[0]") (parseBP_E "[a b]")) (parseBP_E "[b a]" :: Pattern String)
 
     it "should change the pattern with a complex mask 1" $
-      compareP (Arc 0 1) (jumble' 1 (parseBP_E "[1 0 1 0]") (parseBP_E "[a b c d]")) (parseBP_E "[a d c b]" :: Pattern String)
+      property $ \t1 t2 -> compareP (Arc (min t1 t2) (max t1 t2)) (jumble' 1 (parseBP_E "[1 0 1 0]") (parseBP_E "[a b c d]")) (parseBP_E "[a d c b]" :: Pattern String)
 
     it "should change the pattern with a complex mask 2" $
-      compareP (Arc 0 1) (jumble' 1 (parseBP_E "[1 0]") (parseBP_E "[a b c d]")) (parseBP_E "[a b d c]" :: Pattern String)
+      property $ \t1 t2 -> compareP (Arc (min t1 t2) (max t1 t2)) (jumble' 1 (parseBP_E "[1 0]") (parseBP_E "[a b c d]")) (parseBP_E "[a b d c]" :: Pattern String)
 
     it "should change the pattern with a complex mask 3" $
-      compareP (Arc 0 1) (jumble' 1 (parseBP_E "[0 [1 0]]") (parseBP_E "[a b c d]")) (parseBP_E "[b d c a]" :: Pattern String)
+      property $ \t1 t2 -> compareP (Arc (min t1 t2) (max t1 t2)) (jumble' 1 (parseBP_E "[0 [1 0]]") (parseBP_E "[a b c d]")) (parseBP_E "[b d c a]" :: Pattern String)
 
     it "should change the pattern with a complex mask 4" $
-      compareP (Arc 0 1) (jumble' 1 (parseBP_E "[1 0 1 0]") (parseBP_E "[bd [hh cp] sd cp]")) (parseBP_E "[bd [cp cp] sd hh]" :: Pattern String)
+      property $ \t1 t2 -> compareP (Arc (min t1 t2) (max t1 t2)) (jumble' 1 (parseBP_E "[1 0 1 0]") (parseBP_E "[bd [hh cp] sd cp]")) (parseBP_E "[bd [cp cp] sd hh]" :: Pattern String)
 
     it "shouldn't change the pattern when the permutation index loops around" $
-      compareP (Arc 0 1) (jumble' 2 (listToPat [True, False, True, False]) (listToPat [1, 2, 3, 4])) (listToPat [1, 2, 3, 4 :: Int])
+      property $ \t1 t2 -> compareP (Arc (min t1 t2) (min t1 t2)) (jumble' 2 (listToPat [True, False, True, False]) (listToPat [1, 2, 3, 4])) (listToPat [1, 2, 3, 4 :: Int])
 \end{code}
