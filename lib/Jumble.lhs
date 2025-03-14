@@ -41,9 +41,9 @@ jumble' i mp p = stack [static, variable] where
 
   -- rotate a list (head to last) a certain number of times
   rot8 :: Int -> [a] -> [a]
-  rot8 0 xs = xs
   rot8 _ [] = []
-  rot8 n (x:xs) = rot8 (n-1) (xs ++ [x])
+  rot8 n' (x:xs) = if n == 0 then x:xs else rot8 (n-1) (xs ++ [x]) where
+    n = n' `mod` length (x:xs)
 
   -- extract values from an event
   getValue :: Event a -> a
