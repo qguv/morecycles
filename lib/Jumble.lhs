@@ -50,9 +50,14 @@ jumble' i mp p = stack [static, variable] where
   getValue (Event _ _ _ v) = v
 
   -- rotate the values of an event
-  rotateValues Pattern{query=oldQuery} = Pattern{query=newQuery} where
-    newQuery state = inject (rot8 i values) events where
-      events = oldQuery state
+  rotateValues Pattern{query=oldQuery} = splitQueries Pattern{query=newQuery} where
+    newQuery (State (Arc t0 t1) c) = filter (bt . wholeStart) $ inject (rot8 i values) events where
+      bt t = t <= t0 && t <= t1
+      a = Arc (floor' t0) (ceiling' t1)
+      floor' = fromInteger . floor
+      ceiling' = fromInteger . ceiling
+      cycleState = State a c
+      events = oldQuery cycleState
       values = getValue <$> events
 
       -- swap out the value in each event with values from a list
