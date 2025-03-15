@@ -60,14 +60,13 @@ jumble' i mp p = stack [static, variable] where
   inject _ _ = []
 
   cyclewise f Pattern{query=oldQuery} = splitQueries Pattern{query=newQuery} where
-    newQuery (State (Arc t0 t1) c) = contract $ f expandedEvents where
+    newQuery (State (Arc t0 t1) c) = (narrow . f) expandedEvents where
       expandedStart = fromInteger $ floor t0
       expandedEnd = fromInteger $ ceiling t1
       expandedArc = Arc expandedStart $ expandedEnd + (if expandedStart == expandedEnd then 1 else 0)
       expandedState = State expandedArc c
       expandedEvents = oldQuery expandedState
-      contract = filter (bt . wholeStart)
-      bt = isIn (Arc t0 t1)
+      narrow es = [e | e <- es, isIn (Arc t0 t1) (wholeStart e)]
 \end{code}
 
 Using this definition, we can create a non-deterministic version by choosing a permutation index randomly:
