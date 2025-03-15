@@ -66,7 +66,7 @@ jumble' i mp p = stack [static, variable] where
       expandedArc = Arc expandedStart $ expandedEnd + (if expandedStart == expandedEnd then 1 else 0)
       expandedState = State expandedArc c
       expandedEvents = oldQuery expandedState
-      narrow es = [e | e <- es, isIn (Arc t0 t1) (wholeStart e)]
+      narrow es = [e{part=Arc (max t0 p0) (min t1 p1)} | e@Event{part=Arc p0 p1} <- es, isIn (Arc t0 t1) (wholeStart e)]
 \end{code}
 
 Using this definition, we can create a non-deterministic version by choosing a permutation index randomly:
