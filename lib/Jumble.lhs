@@ -50,20 +50,24 @@ jumble' i mp p = stack [static, variable] where
   getValue (Event _ _ _ v) = v
 
   -- rotate the values of an event
-  rotateValues Pattern{query=oldQuery} = splitQueries Pattern{query=newQuery} where
-    newQuery (State (Arc t0 t1) c) = filter (bt . wholeStart) $ inject (rot8 i values) events where
-      bt t = t <= t0 && t <= t1
-      a = Arc (floor' t0) (ceiling' t1)
-      floor' = fromInteger . floor
-      ceiling' = fromInteger . ceiling
-      cycleState = State a c
-      events = oldQuery cycleState
+  rotateValues = cyclewise f where
+    f events = inject (rot8 i values) events where
       values = getValue <$> events
 
-      -- swap out the value in each event with values from a list
-      inject :: [a] -> [Event b] -> [Event a]
-      inject (v:vs) (e:es) = e{value=v} : inject vs es
-      inject _ _ = []
+  -- swap out the value in each event with values from a list
+  inject :: [a] -> [Event b] -> [Event a]
+  inject (v:vs) (e:es) = e{value=v} : inject vs es
+  inject _ _ = []
+
+  cyclewise f Pattern{query=oldQuery} = splitQueries Pattern{query=newQuery} where
+    newQuery (State (Arc t0 t1) c) = contract $ f expandedEvents where
+      expandedStart = fromInteger $ floor t0
+      expandedEnd = fromInteger $ ceiling t1
+      expandedArc = Arc expandedStart $ expandedEnd + (if expandedStart == expandedEnd then 1 else 0)
+      expandedState = State expandedArc c
+      expandedEvents = oldQuery expandedState
+      contract = filter (bt . wholeStart)
+      bt = isIn (Arc t0 t1)
 \end{code}
 
 Using this definition, we can create a non-deterministic version by choosing a permutation index randomly:
