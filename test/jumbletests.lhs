@@ -25,8 +25,11 @@ instance (Arbitrary a) => Arbitrary (Pattern a) where
       , sequence [resize (n `div` 2) arbitrary, resize (n `div` 2) arbitrary, resize (n `div` 2) arbitrary]
       , sequence [resize (n `div` 2) arbitrary, resize (n `div` 2) arbitrary, resize (n `div` 2) arbitrary, resize (n `div` 2) arbitrary] ]
 
-instance (Fractional a, Arbitrary a) => Arbitrary (ArcF a) where
-  arbitrary = sized $ \i -> Arc 0 <$> resize (i `div` 2) arbitrary
+instance (Fractional a, Arbitrary a, Eq a) => Arbitrary (ArcF a) where
+  arbitrary = sized m where
+    m i = Arc 0 . notZero <$> x where
+      x = resize (i `div` 2) arbitrary
+      notZero n = if n == 0 then 1 else n
 \end{code}
 
 We can now define our tests:
