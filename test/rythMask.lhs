@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-"GlitchMask": Probability-Based Masking
-The idea behind GlitchMask is to create a rhythmic effect where some beats are 
+"RhythMask": Probability-Based Masking
+The idea behind RhythMask is to create a rhythmic effect where some beats are 
 probabilistically dropped or kept each cycle, 
 rather than being strictly fixed by a binary mask.
 
