@@ -1,0 +1,18 @@
+d1 $ n "c a f e" # sound "hh" # gain 1.5
+
+d2 $ n (off 0.125 (|+ 7) "<c a f e>") # sound "supermandolin"
+
+d3 $ jux rev $ n (off 0.125 (|+ 7)  "<c*2 a(3,8) f(3,8,2) e*2>")
+  # sound "supermandolin"
+  # legato 2
+
+d4 $ jux rev $ n (off 0.125 (|+ 12) $ off 0.125 (|+ 7)  "<c*2 a(3,8) f(3,8,2) e*2>")
+  # sound "superpiano"
+  # legato 2
+  # gain 0.8
+
+d5 $ n "0 0 [2 0] [2 3]" # sound "feel" # speed 1.5
+
+import jumble
+
+hush
