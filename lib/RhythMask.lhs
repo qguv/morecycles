@@ -1,5 +1,3 @@
-{-# OPTIONS_GHC -Wno-orphans #-}
-
 "RhythMask": Probability-Based Masking
 The idea behind RhythMask is to create a rhythmic effect where some beats are 
 probabilistically dropped or kept each cycle, 
@@ -19,3 +17,18 @@ Steps of implementation:
 ->Random Decision Making: A random number is generated for each event, and if it is below the 
 probability threshold, the event passes on to the final output, otherwise it is removed.
 ->Reconstruction of the Pattern: The remaining beats are reconstructed into a new TidalCycles pattern.
+
+
+\begin{code}
+module RhythMask where
+
+import Sound.Tidal.Pattern
+import Sound.Tidal.UI
+import Sound.Tidal.Core
+import Data.List
+
+-- placeholder to keep stack happy
+rhythmask :: Pattern a -> Pattern a
+rhythmask = undefined
+
+\end{code}

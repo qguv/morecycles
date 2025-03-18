@@ -12,3 +12,15 @@ a content pattern (Pattern a) and a mask pattern (Pattern Bool).
 The function produces an output pattern where any event that overlaps with a `True` in the mask pattern
 is duplicated with an additional grace note occurring just before it.
 
+\begin{code}
+module GraceNotes where
+
+import Sound.Tidal.Pattern
+import Sound.Tidal.UI
+import Sound.Tidal.Core
+import Data.List
+
+-- deterministic swing function with a given swing amount
+gracenotes' :: Double -> Pattern Bool -> Pattern a -> Pattern a
+gracenotes' = undefined
+\end{code}

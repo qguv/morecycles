@@ -1,6 +1,9 @@
-import Sound.Tidal.Context
+\begin{code}
+module PolyShift where
 
--plays a pattern only on the kth cycle
+\end{code}
+
+- plays a pattern only on the kth cycle
 
 playOnly n k p = every' n k (<> p) "~" 
 
@@ -17,3 +20,4 @@ helper j k l m n p
     | l <= 1 = playOnly k (m+1) $ (~> (l-1)) p <> helper (j-1) k ((l-1)+n) (m+1) n p
 
 polyShift n p = helper (denominator n) (denominator n) 0 0 n p
+

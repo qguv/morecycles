@@ -14,4 +14,15 @@ is replaced with a ghost note, meaning its velocity or intensity is reduced.
 
 
 \begin{code}
+module GhostNotes where
+
+import Sound.Tidal.Pattern
+import Sound.Tidal.UI
+import Sound.Tidal.Core
+import Data.List
+
+-- deterministic swing function with a given swing amount
+ghostnotes' :: Double -> Pattern Bool -> Pattern a -> Pattern a
+ghostnotes' = undefined
+
 \end{code}

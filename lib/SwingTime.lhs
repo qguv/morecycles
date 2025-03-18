@@ -14,3 +14,17 @@ Non-Deterministic Swing
 Randomly selects a swing amount for each cycle, introducing variations in the groove.
 Can create a more organic, expressive feel. Whereas the goal of \texttt{jitter} is to make the music
 more human-like, the aim of non-deterministic swing is to create a dynamic groove that retains musical cohesion while introducing subtle rhythmic variation
+
+\begin{code}
+module SwingTime where
+
+import Sound.Tidal.Pattern
+import Sound.Tidal.UI
+import Sound.Tidal.Core
+import Data.List
+
+-- deterministic swing function with a given swing amount
+swing :: Double -> Pattern Bool -> Pattern a -> Pattern a
+swing = undefined
+
+\end{code}
