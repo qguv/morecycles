@@ -11,3 +11,7 @@ allowing for dynamic and varied performances. We call this function \texttt{ghos
 a content pattern (Pattern a) and a mask pattern (Pattern Bool). 
 The function produces an output pattern where any event that overlaps with a `True` in the mask pattern
 is replaced with a ghost note, meaning its velocity or intensity is reduced.
+
+
+\begin{code}
+\end{code}
