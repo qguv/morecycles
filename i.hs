@@ -9,6 +9,7 @@ import Sound.Tidal.Core
 import Sound.Tidal.ParseBP
 
 import Jumble
+import GraceNotes
 
 {-
 string to pattern, e.g.
