@@ -21,6 +21,7 @@ module SwingTime where
 import Sound.Tidal.Pattern
 import Sound.Tidal.UI
 import Sound.Tidal.Core
+import Sound.Tidal.ParseBP
 
 
 -- deterministic swing function with a given swing amount
