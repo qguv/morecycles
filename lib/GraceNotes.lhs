@@ -20,7 +20,69 @@ import Sound.Tidal.UI
 import Sound.Tidal.Core
 import Data.List
 
--- deterministic swing function with a given swing amount
+-- | gracenotes' adds grace notes before events that match the mask pattern
+-- The Double parameter specifies how early the grace note starts
 gracenotes' :: Double -> Pattern Bool -> Pattern a -> Pattern a
-gracenotes' = undefined
+gracenotes' startTime mp p = stack [original, graceNotes] where
+  original = p
+  -- Get all events from the original pattern for a given state
+  getOriginalEvents state = query p state
+  -- Create grace notes for events that match the mask
+  graceNotes = Pattern{query=newQuery}
+  newQuery state =
+    let 
+      -- Get events that match the mask
+      maskedEvents = query (mask mp p) state
+      -- Get all events from the original pattern
+      allEvents = getOriginalEvents state
+      -- If there are no events, return empty list
+      result = if null maskedEvents || null allEvents
+               then []
+               else
+                 let
+                   -- Sort all events by start time to establish sequence
+                   sortedEvents = sortBy (\e1 e2 -> compare (start $ part e1) (start $ part e2)) allEvents
+                   -- Create a circular list of values from the original pattern
+                   originalValues = cycle $ map value sortedEvents
+                   -- For each masked event, find its position in the original sequence
+                   -- and get the next value from the original sequence
+                   createGraceNotes e =
+                     let
+                       eTime = start $ part e
+                       -- Find the index of this event in the sorted sequence
+                       -- (or the closest one if exact match not found)
+                       findNextIndex [] _ = 0
+                       findNextIndex [_] _ = 0
+                       findNextIndex (x:xs) t =
+                         if abs (start (part x) - t) < 0.0001
+                         then 0  -- Found the event
+                         else 1 + findNextIndex xs t
+                       eventIndex = findNextIndex sortedEvents eTime
+                       -- Get the next value in the original sequence (wrapping if needed)
+                       nextValue = originalValues !! (eventIndex + 1)
+                       -- Create the grace note
+                       t0 = start $ part e
+                       offsetTime = realToFrac startTime :: Time
+                       graceStart = max 0 (t0 - offsetTime)
+                       graceEnd = t0
+                       gracePart = Arc graceStart graceEnd
+                       graceEvent = e {part = gracePart, value = nextValue}
+                     in graceEvent
+                 in map createGraceNotes maskedEvents
+    in result
+
+-- | Non-deterministic version that randomly selects a grace note offset
+gracenotes :: Double -> Pattern Bool -> Pattern a -> Pattern a
+gracenotes maxOffset mp p = Pattern{query=newQuery} where
+  newQuery state = 
+    let 
+      t0 = start $ arc state
+      -- Generate a random offset based on the cycle
+      cycleNum = floor t0
+      g = mkStdGen cycleNum
+      randomVal = fst (randomR (0.01, maxOffset) g)
+    in query (gracenotes' randomVal mp p) state
+
+
 \end{code}
+p2e $ gracenotes' 1 (s2p "[1 0 1 0]" :: Pattern Bool) (s2p "[a b c d]" :: Pattern String)
