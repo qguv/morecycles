@@ -21,10 +21,31 @@ module SwingTime where
 import Sound.Tidal.Pattern
 import Sound.Tidal.UI
 import Sound.Tidal.Core
-import Data.List
+
 
 -- deterministic swing function with a given swing amount
-swing :: Double -> Pattern Bool -> Pattern a -> Pattern a
-swing = undefined
+swing' :: Double -> Pattern Bool -> Pattern a -> Pattern a
+swing' amt mp p = stack [static, swung] where
+  static = mask mp p
+  swung = adjustTimes (shiftAmount amt) $ mask (inv mp) p
+
+  shiftAmount :: Double -> Arc -> Arc
+  shiftAmount amt (Arc s end) = Arc (s + p) (end + p)
+    where 
+      unit = end - s
+      p = toRational (amt * fromRational unit)
+
+  -- Adjust times for swing feel
+  adjustTimes :: (Arc -> Arc) -> Pattern a -> Pattern a
+  adjustTimes f Pattern{query=oldQuery} = Pattern{query=newQuery} where
+    newQuery (State a c) = [e {part = f (part e)} | e <- oldQuery (State a c)]
+
+-- non-deterministic swing function which randomly varies the swing amount
+-- swing :: Pattern Bool -> Pattern a -> Pattern a
+-- swing _mp _p = Pattern{query=newQuery} where
+--   newQuery _state = undefined -- TODO: Implement random swing amount selection
+
+-- let p1 = parseBP_E "[a b c d]"
+-- let p2 = parseBP_E "[1 0 1 0]"
 
 \end{code}
