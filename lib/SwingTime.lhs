@@ -22,7 +22,7 @@ import Sound.Tidal.Pattern
 import Sound.Tidal.UI
 import Sound.Tidal.Core
 import Sound.Tidal.ParseBP
-
+import Sound.Tidal.Context
 
 -- deterministic swing function with a given swing amount
 swing' :: Double -> Pattern Bool -> Pattern a -> Pattern a
@@ -31,7 +31,7 @@ swing' amt mp p = stack [static, swung] where
   swung = adjustTimes (shiftAmount amt) $ mask (inv mp) p
 
   shiftAmount :: Double -> Arc -> Arc
-  shiftAmount amt (Arc s end) = Arc (s + p) (end + p)
+  shiftAmount amt (Arc s end) = Arc (s + p) (end)
     where 
       unit = end - s
       p = toRational (amt * fromRational unit)
