@@ -10,6 +10,7 @@ import Sound.Tidal.ParseBP
 
 import SwingTime
 import Jumble
+import GraceNotes
 
 {-
 string to pattern, e.g.
