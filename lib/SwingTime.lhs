@@ -31,7 +31,7 @@ swing' amt mp p = stack [static, swung] where
   swung = adjustTimes (shiftAmount amt) $ mask (inv mp) p
 
   shiftAmount :: Double -> Arc -> Arc
-  shiftAmount amt (Arc start end) = Arc (start - shift) (end - shift)
+  shiftAmount amt (Arc start end) = Arc (start + shift) (end)
     where 
       unit = end - start
       shift = toRational (amt * fromRational unit)
@@ -48,5 +48,7 @@ swing _mp _p = Pattern{query=newQuery} where
 
 -- let p1 = parseBP_E "[a b c d]"
 -- let p2 = parseBP_E "[1 0 1 0]"
+
+-- swing' 0.5 p2 p1
 
 \end{code}
