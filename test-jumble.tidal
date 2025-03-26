@@ -1,0 +1,25 @@
+jumble' :: Int -> Pattern Bool -> Pattern a -> Pattern a
+jumble' 0 _ p = p
+jumble' i mp p = stack [static, variable] where
+  static = mask mp p
+  variable = rotateValues $ mask (inv mp) p
+  rot8 :: Int -> [a] -> [a]
+  rot8 _ [] = []
+  rot8 n' (x:xs) = if n == 0 then x:xs else rot8 (n-1) (xs ++ [x]) where
+    n = n' `mod` length (x:xs)
+  getValue :: Event a -> a
+  getValue (Event _ _ _ v) = v
+  rotateValues = cyclewise f where
+    f events = inject (rot8 i values) events where
+      values = getValue <$> events
+  inject :: [a] -> [Event b] -> [Event a]
+  inject (v:vs) (e:es) = e{value=v} : inject vs es
+  inject _ _ = []
+  cyclewise f Pattern{query=oldQuery} = splitQueries Pattern{query=newQuery} where
+    newQuery (State (Arc t0 t1) c) = (narrow . f) expandedEvents where
+      expandedStart = fromInteger $ floor t0
+      expandedEnd = fromInteger $ ceiling t1
+      expandedArc = Arc expandedStart $ expandedEnd + (if expandedStart == expandedEnd then 1 else 0)
+      expandedState = State expandedArc c
+      expandedEvents = oldQuery expandedState
+      narrow es = [e{part=Arc (max t0 p0) (min t1 p1)} | e@Event{part=Arc p0 p1} <- es, isIn (Arc t0 t1) (wholeStart e)]

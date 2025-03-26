@@ -1,0 +1,35 @@
+parseMask :: String -> Pattern Bool
+parseMask s =
+  let bits = map (== "1") (words s)
+  in fastcat (map pure bits)
+myFilterEvents :: Pattern a -> Pattern Bool -> Pattern a
+myFilterEvents pat maskPat = Pattern $ \s ->
+  let es = query pat s
+      bs = query maskPat s
+      filtered = [ e | (e, b) <- zip es bs, value b ]
+  in filtered
+rhythmask :: Pattern a -> String -> Pattern a
+rhythmask pat maskStr = myFilterEvents pat (parseMask maskStr)
+rhythmaskWith :: Pattern a -> String -> (Pattern a -> Pattern a) -> Pattern a
+rhythmaskWith pat maskStr transform =
+  let maskP    = parseMask maskStr
+      notMaskP = fmap not maskP
+      kept         = myFilterEvents pat maskP
+      transformed  = myFilterEvents (transform pat) notMaskP
+  in stack [kept, transformed]
+
+d1 $ rhythmask (sound (parseBP_E "hh arpy bd sn")) "1 0 0 1"
+
+d1 $ rhythmaskWith (sound "hh arpy bd sn") "0 0 0 0" (# crush 0.5)
+
+d1 $ sound "hh arpy bd sn"
+
+d1 $ sound "hh"
+
+d1 $ sound "arpy"
+
+d1 $ sound "bd"
+
+d1 $ sound "sn"
+
+hush
