@@ -20,10 +20,10 @@ import Sound.Tidal.UI
 import Sound.Tidal.Core
 import Data.List
 
--- | gracenotes' adds grace notes before events that match the mask pattern
+-- | gracenotes adds grace notes before events that match the mask pattern
 -- The Double parameter specifies how early the grace note starts
-gracenotes' :: Double -> Pattern Bool -> Pattern a -> Pattern a
-gracenotes' startTime mp p = stack [original, graceNotes] where
+gracenotes :: Double -> Pattern Bool -> Pattern a -> Pattern a
+gracenotes startTime mp p = stack [original, graceNotes] where
   original = p
   -- Get all events from the original pattern for a given state
   getOriginalEvents state = query p state
@@ -71,18 +71,7 @@ gracenotes' startTime mp p = stack [original, graceNotes] where
                  in map createGraceNotes maskedEvents
     in result
 
--- | Non-deterministic version that randomly selects a grace note offset
-gracenotes :: Double -> Pattern Bool -> Pattern a -> Pattern a
-gracenotes maxOffset mp p = Pattern{query=newQuery} where
-  newQuery state = 
-    let 
-      t0 = start $ arc state
-      -- Generate a random offset based on the cycle
-      cycleNum = floor t0
-      g = mkStdGen cycleNum
-      randomVal = fst (randomR (0.01, maxOffset) g)
-    in query (gracenotes' randomVal mp p) state
-
 
 \end{code}
-p2e $ gracenotes' 1 (s2p "[1 0 1 0]" :: Pattern Bool) (s2p "[a b c d]" :: Pattern String)
+p2e $ gracenotes 1 (s2p "[1 0 1 0]" :: Pattern Bool) (s2p "[a b c d]" :: Pattern String)
+d1 $ gracenotes' 0.125 ("1 0 1 0" :: Pattern Bool) (n "c a f e" # sound "supermandolin")
