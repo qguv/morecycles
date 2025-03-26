@@ -29,13 +29,11 @@ swing' :: Double -> Pattern Bool -> Pattern a -> Pattern a
 swing' amt mp p = stack [static, swung] where
   static = mask mp p
   swung = adjustTimes (shiftAmount amt) $ mask (inv mp) p
-
   shiftAmount :: Double -> Arc -> Arc
   shiftAmount amt (Arc start end) = Arc (start + shift) (end + shift)
     where 
       unit = end - start
       shift = toRational (amt * fromRational unit)
-
   -- Adjust times for swing feel
   adjustTimes :: (Arc -> Arc) -> Pattern a -> Pattern a
   adjustTimes f Pattern{query=oldQuery} = Pattern{query=newQuery} where
