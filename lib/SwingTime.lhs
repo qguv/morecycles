@@ -25,28 +25,31 @@ import Sound.Tidal.ParseBP
 import Sound.Tidal.Context
 
 -- deterministic swing function with a given swing amount
-swing' :: Double -> Pattern Bool -> Pattern a -> Pattern a
-swing' amt mp p = stack [static, swung] where
-  static = mask mp p
-  swung = adjustTimes (shiftAmount amt) $ mask (inv mp) p
-  shiftAmount :: Double -> Arc -> Arc
-  shiftAmount amt (Arc start end) = Arc (start + shift) (end + shift)
-    where 
-      unit = end - start
-      shift = toRational (amt * fromRational unit)
-  -- Adjust times for swing feel
-  adjustTimes :: (Arc -> Arc) -> Pattern a -> Pattern a
-  adjustTimes f Pattern{query=oldQuery} = Pattern{query=newQuery} where
-    newQuery (State a c) = [e {part = f (part e)} | e <- oldQuery (State a c)]
-
--- non-deterministic swing function which randomly varies the swing amount
-swing :: Pattern Bool -> Pattern a -> Pattern a
-swing _mp _p = Pattern{query=newQuery} where
-  newQuery _state = undefined
+swing' :: Rational -> Pattern Bool -> Pattern a -> Pattern a
+swing' amt mp p = p {query = \st -> concatMap (applySwing mp st) (query p st)}
+  where
+    applySwing :: Pattern Bool -> State -> Event a -> [Event a]
+    applySwing mask st ev = 
+      case whole ev of
+        Nothing -> [ev]  -- If there's no whole, return the event unchanged
+        Just a -> 
+          let s = start a
+              e = stop a
+              swingAtSt = query mask (st {arc = Arc s e})
+              shouldSwing = not (null swingAtSt) && any (isTrue . value) swingAtSt
+              isTrue True = True
+              isTrue _ = False
+              swingShift = if shouldSwing then amt else 0
+              newArc = Arc (s + swingShift) (e + swingShift)
+          in [ev {whole = Just newArc}]
 
 -- let p1 = parseBP_E "[a b c d]"
 -- let p2 = parseBP_E "[1 0 1 0]"
 
--- swing' 0.5 p2 p1
-
+-- swing' (1/3) p2 p1
 \end{code}
+
+Test in ghci:
+p2e $ swing' 0.125 (s2p "[1 0 1 0]" :: Pattern Bool) (s2p "[a b c d]" :: Pattern String)
+Test in tidal:
+d1 $ swing' 0.125 ("1 0 1 0" :: Pattern Bool) (n "c a f e" # sound "supermandolin")

@@ -73,5 +73,8 @@ gracenotes startTime mp p = stack [original, graceNotes] where
 
 
 \end{code}
+
+Test in ghci:
 p2e $ gracenotes 1 (s2p "[1 0 1 0]" :: Pattern Bool) (s2p "[a b c d]" :: Pattern String)
-d1 $ gracenotes' 0.125 ("1 0 1 0" :: Pattern Bool) (n "c a f e" # sound "supermandolin")
+Test in tidal:
+d1 $ gracenotes 0.125 ("1 0 1 0" :: Pattern Bool) (n "c a f e" # sound "supermandolin")
