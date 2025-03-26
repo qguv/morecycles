@@ -26,7 +26,7 @@ import Sound.Tidal.Context
 
 -- deterministic swing function with a given swing amount
 swing' :: Double -> Pattern Bool -> Pattern a -> Pattern a
-swing' amt mp p = stack [static] where
+swing' amt mp p = stack [static, swung] where
   static = mask mp p
   swung = adjustTimes (shiftAmount amt) $ mask (inv mp) p
 
