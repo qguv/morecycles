@@ -27,3 +27,4 @@ cabal.sandbox.config
 dist
 dist-*
 *.cabal
+.vscode/

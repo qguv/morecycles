@@ -110,9 +110,14 @@ Load this module in your TidalCycles session:
 Apply jitter to a pattern with a fixed maximum jitter:
   
 \texttt{d1 \$ jitter (sound "bd sn cp hh") 0.02}
+
+This will randomly shift each event's start time by up to ±0.02 cycles.
   
 Apply jitter to a pattern with a varying maximum jitter:
   
 \texttt{d1 \$ jitterP (sound "bd sn cp hh") (range 0.01 0.05 sine)}
 
-This will randomly shift each event's start time by up to ±0.02 cycles.
+This will apply random timing variations to each event based on the corresponding 
+value in the sine wave pattern, with jitter ranging from 0.01 to 0.05 cycles.
+
+
