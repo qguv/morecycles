@@ -15,7 +15,7 @@ module Jitter where
 import Sound.Tidal.Pattern
 import System.Random
 import System.IO.Unsafe (unsafePerformIO) -- Import unsafePerformIO to extract a random value from an IO action.
---import Sound.Tidal.Context (TidalParseError(code), begin)
+
 \end{code}
 
 The function \texttt{myModifyTime} enables precise timing modifications by applying a transformation function 
@@ -102,22 +102,16 @@ jitterP pat maxJitterPat = Pattern $ \s ->
     in map updateEvent contentEvents
 \end{code}
 
-Load this module in your TidalCycles session:
-  
-\texttt{:set -i"/Users/debduttaguharoy/Developer/Y2P4 - Functional Programming/Project/morecycles/lib"
-:m + JitterCombined}
-  
-Apply jitter to a pattern with a fixed maximum jitter:
-  
-\texttt{d1 \$ jitter (sound "bd sn cp hh") 0.02}
+\begin{itemize}
 
+\item Load this module in your TidalCycles session: \verb|:set -i"/morecycles/lib"
+:m + JitterCombined|
+  
+\item Apply jitter to a pattern with a fixed maximum jitter: \verb|d1 \$ jitter (sound "bd sn cp hh") 0.02|
 This will randomly shift each event's start time by up to ±0.02 cycles.
   
-Apply jitter to a pattern with a varying maximum jitter:
-  
-\texttt{d1 \$ jitterP (sound "bd sn cp hh") (range 0.01 0.05 sine)}
-
+\item Apply jitter to a pattern with a varying maximum jitter: \verb|d1 \$ jitterP (sound "bd sn cp hh") (range 0.01 0.05 sine)|
 This will apply random timing variations to each event based on the corresponding 
 value in the sine wave pattern, with jitter ranging from 0.01 to 0.05 cycles.
 
-
+\end{itemize}
