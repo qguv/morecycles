@@ -8,6 +8,7 @@ import Sound.Tidal.UI
 import Sound.Tidal.Core
 import Sound.Tidal.ParseBP
 
+import SwingTime
 import Jumble
 import GraceNotes
 import SwingTime
