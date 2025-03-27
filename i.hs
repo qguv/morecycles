@@ -10,7 +10,7 @@ import Sound.Tidal.ParseBP
 
 import Jumble
 import GraceNotes
-
+import SwingTime
 {-
 string to pattern, e.g.
     ghci> s2p "[a b c d]" :: Pattern String
