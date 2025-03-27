@@ -1,7 +1,11 @@
 {-# OPTIONS_GHC -Wno-name-shadowing #-}
+{-# OPTIONS_GHC -Wno-type-defaults #-}
 module Rhythmask where
 
 import Sound.Tidal.Context
+
+randomMaskString :: Int -> String
+randomMaskString n = unwords $ take n $ map (\x -> if even (x * 37 `mod` 7) then "1" else "0") [1..]
 
 {-|
   parseMask converts a binary mask string (e.g. "1 0 1 0") into a Pattern Bool.

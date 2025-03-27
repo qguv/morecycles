@@ -1,4 +1,5 @@
-parseMask :: String -> Pattern Bool
+randomMaskString :: Int -> String
+randomMaskString n = unwords $ take n $ map (\x -> if even (x * 37 `mod` 7) then "1" else "0") [1..]
 parseMask s =
   let bits = map (== "1") (words s)
   in fastcat (map pure bits)
@@ -18,18 +19,12 @@ rhythmaskWith pat maskStr transform =
       transformed  = myFilterEvents (transform pat) notMaskP
   in stack [kept, transformed]
 
-d1 $ rhythmask (sound (parseBP_E "hh arpy bd sn")) "1 0 0 1"
+d1 $ rhythmask (sound (parseBP_E "bd sn bd sn")) "1 0 1 0"
+
+d1 $ rhythmask (sound (parseBP_E "hh arpy bd sn")) (randomMaskString 4)
 
 d1 $ rhythmaskWith (sound "hh arpy bd sn") "0 0 0 0" (# crush 0.5)
 
 d1 $ sound "hh arpy bd sn"
-
-d1 $ sound "hh"
-
-d1 $ sound "arpy"
-
-d1 $ sound "bd"
-
-d1 $ sound "sn"
 
 hush

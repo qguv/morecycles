@@ -19,58 +19,60 @@ probability threshold, the event passes on to the final output, otherwise it is 
 ->Reconstruction of the Pattern: The remaining beats are reconstructed into a new TidalCycles pattern.
 
 \begin{code}
-{-# LANGUAGE OverloadedStrings #-}
-{-# OPTIONS_GHC -Wno-orphans #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# HLINT ignore "Redundant lambda" #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# HLINT ignore "Redundant lambda" #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# HLINT ignore "Redundant lambda" #-}
 {-# OPTIONS_GHC -Wno-name-shadowing #-}
+{-# OPTIONS_GHC -Wno-type-defaults #-}
+module Rhythmask where
 
-module RhythmMask where
 import Sound.Tidal.Context
-import Data.List (find)
 
--- | Parses a binary rhythm mask into a Pattern Bool
+randomMaskString :: Int -> String
+randomMaskString n = unwords $ take n $ map (\x -> if even (x * 37 `mod` 7) then "1" else "0") [1..]
+
+{-|
+  parseMask converts a binary mask string (e.g. "1 0 1 0") into a Pattern Bool.
+  It splits the string into words, maps "1" to True and any other word to False,
+  cycles the resulting list, and then limits it to one cycle using take.
+-}
 parseMask :: String -> Pattern Bool
-parseMask s = boolPat
-  where
-    bits = cycle $ map (== "1") $ words s  -- Compares String == String
-    boolPat = segment (fromIntegral $ length $ words s) $ slowcat $ map pure bits
+parseMask s =
+  let bits = map (== "1") (words s)
+  in fastcat (map pure bits)
+{-|
+  myFilterEvents takes a pattern 'pat' and a boolean mask pattern 'maskPat'
+  and produces a new pattern that only keeps events where the mask is True.
+  (It extracts the events from both patterns at a given time, zips them, and
+  keeps an event if its corresponding mask event (extracted via value) is True.)
+-}
+myFilterEvents :: Pattern a -> Pattern Bool -> Pattern a
+myFilterEvents pat maskPat = Pattern $ \s ->
+  let es = query pat s
+      bs = query maskPat s
+      filtered = [ e | (e, b) <- zip es bs, value b ]
+  in filtered
 
--- | Applies a rhythm mask to a pattern, keeping only the "1" parts of the mask
-rhythmask :: String -> Pattern a -> Pattern a
-rhythmask maskStr = filterByPattern (const True) (parseMask maskStr)
+{-|
+  rhythmask applies a mask (given as a string like "1 0 1 0") to a pattern.
+  Only events corresponding to a True (or "1") in the mask will be kept.
+-}
+rhythmask :: Pattern a -> String -> Pattern a
+rhythmask pat maskStr = myFilterEvents pat (parseMask maskStr)
 
-rhythmaskWith :: String -> (Pattern a -> Pattern a) -> Pattern a -> Pattern a
-rhythmaskWith maskStr transform pat =
-  stack
-    [ filterByPattern (const True) maskP pat
-    , filterByPattern (const True) notMaskP (transform pat)
-    ]
-  where
-    maskP = parseMask maskStr
-    notMaskP = fmap not maskP
+{-|
+  rhythmaskWith applies a transformation to the events that are masked out.
+  It splits the pattern into two parts:
+    1. 'kept' events where the mask is True,
+    2. 'transformed' events (obtained by applying the given transformation)
+       where the mask is False.
+  These two layers are then combined using 'stack'.
+-}
+rhythmaskWith :: Pattern a -> String -> (Pattern a -> Pattern a) -> Pattern a
+rhythmaskWith pat maskStr transform =
+  let maskP    = parseMask maskStr
+      notMaskP = fmap not maskP
+      kept         = myFilterEvents pat maskP
+      transformed  = myFilterEvents (transform pat) notMaskP
+  in stack [kept, transformed]
 
--- | Filters pattern values based on a Pattern Bool
-filterByPattern :: (a -> Bool) -> Pattern Bool -> Pattern a -> Pattern a
-filterByPattern _ cond p = Pattern $ \t ->
-  let conds = map (\e -> (eventPart e, value e)) (queryArc cond (arc t))
-      events = queryArc p (arc t)
-      matches = \e -> case lookupEvent (eventPart e) conds of
-                        Just True -> True
-                        _         -> False
-  in filter matches events
-
--- | Looks up whether an event should pass based on arc match
-lookupEvent :: Arc -> [(Arc, Bool)] -> Maybe Bool
-lookupEvent a = fmap snd . find (\(a', _) -> a' == a)
-
--- | Example usage (to try in GHCi or a `.tidal` script):
--- d1 $ rhythmask "1 0 1 1 0" $ sound "bd sn hh cp arpy"
--- d2 $ rhythmaskWith "1 0 0 1" (|+| gain 0.3) $ sound "arpy*4"
 
 
 \end{code}
