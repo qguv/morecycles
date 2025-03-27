@@ -19,37 +19,57 @@ more human-like, the aim of non-deterministic swing is to create a dynamic groov
 module SwingTime where
 
 import Sound.Tidal.Pattern
-import Sound.Tidal.UI
-import Sound.Tidal.Core
-import Sound.Tidal.ParseBP
-import Sound.Tidal.Context
 
 -- deterministic swing function with a given swing amount
 swing' :: Rational -> Pattern Bool -> Pattern a -> Pattern a
 swing' amt mp p = p {query = \st -> concatMap (applySwing mp st) (query p st)}
   where
     applySwing :: Pattern Bool -> State -> Event a -> [Event a]
-    applySwing mask st ev = 
+    applySwing maskPattern st ev = 
       case whole ev of
         Nothing -> [ev]  -- If there's no whole, return the event unchanged
         Just a -> 
-          let s = start a
-              e = stop a
-              swingAtSt = query mask (st {arc = Arc s e})
+          let startTime = start a
+              endTime = stop a
+              swingAtSt = query maskPattern (st {arc = Arc startTime endTime})
               shouldSwing = not (null swingAtSt) && any (isTrue . value) swingAtSt
               isTrue True = True
               isTrue _ = False
               swingShift = if shouldSwing then amt else 0
-              newArc = Arc (s + swingShift) (e + swingShift)
+              newArc = Arc (startTime + swingShift) (endTime + swingShift)
           in [ev {whole = Just newArc}]
 
--- let p1 = parseBP_E "[a b c d]"
--- let p2 = parseBP_E "[1 0 1 0]"
 
--- swing' (1/3) p2 p1
+
+-- non-deterministic swing function that randomly selects a swing amount for each cycle
+-- it also randomizes the mask pattern
+randomswing :: Pattern a -> Pattern a
+randomswing p = p {query = \st -> concatMap (applyRandomSwing st) (query p st)}
+  where
+    applyRandomSwing :: State -> Event a -> [Event a]
+    applyRandomSwing st ev = 
+      case whole ev of
+        Nothing -> [ev]  -- If there's no whole, return the event unchanged
+        Just a -> 
+          let startTime = start a
+              endTime = stop a
+              -- Determine if this is an off-beat based on position in cycle
+              cyclePos = startTime - (fromIntegral $ floor startTime)
+              -- Simple pseudo-random function based on cycle position
+              isOffBeat = (floor (cyclePos * 4) `mod` 2) == 1
+              -- Generate a pseudo-random swing amount based on cycle number
+              cycleNum = floor startTime
+              swingAmount = 0.05 + (fromIntegral (cycleNum `mod` 11) / 100)
+              -- Apply swing if it's an off-beat
+              swingShift = if isOffBeat then swingAmount else 0
+              newArc = Arc (startTime + swingShift) (endTime + swingShift)
+          in [ev {whole = Just newArc}]
+
 \end{code}
+
 
 Test in ghci:
 p2e $ swing' 0.125 (s2p "[1 0 1 0]" :: Pattern Bool) (s2p "[a b c d]" :: Pattern String)
+p2e $ randomswing (s2p "[a b c d]" :: Pattern String)
 Test in tidal:
 d1 $ swing' 0.125 ("1 0 1 0" :: Pattern Bool) (n "c a f e" # sound "supermandolin")
