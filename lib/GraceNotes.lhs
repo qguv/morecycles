@@ -20,10 +20,12 @@ import Sound.Tidal.UI
 import Sound.Tidal.Core
 import Data.List
 
--- | gracenotes adds grace notes before events that match the mask pattern
--- The Double parameter specifies how early the grace note starts
-gracenotes :: Double -> Pattern Bool -> Pattern a -> Pattern a
-gracenotes startTime mp p = stack [original, graceNotes] where
+{--
+gracenotes adds grace notes before events that match the mask pattern
+The Double parameter specifies how early the grace note starts
+--}
+gracenotes :: Time -> Pattern Bool -> Pattern a -> Pattern a
+gracenotes offset mp p = stack [original, graceNotes] where
   original = p
   -- Get all events from the original pattern for a given state
   getOriginalEvents state = query p state
@@ -62,19 +64,16 @@ gracenotes startTime mp p = stack [original, graceNotes] where
                        nextValue = originalValues !! (eventIndex + 1)
                        -- Create the grace note
                        t0 = start $ part e
-                       offsetTime = realToFrac startTime :: Time
-                       graceStart = max 0 (t0 - offsetTime)
+                       graceStart = t0 - offset
                        graceEnd = t0
                        gracePart = Arc graceStart graceEnd
-                       graceEvent = e {part = gracePart, value = nextValue}
+                       graceEvent = e {part = gracePart, whole=Just gracePart, value = nextValue}
                      in graceEvent
                  in map createGraceNotes maskedEvents
     in result
-
-
 \end{code}
 
 Test in ghci:
-p2e $ gracenotes 1 (s2p "[1 0 1 0]" :: Pattern Bool) (s2p "[a b c d]" :: Pattern String)
+p2e $ gracenotes 1 (s2p "[1 1 1 1]" :: Pattern Bool) (s2p "[a b c d]" :: Pattern String)
 Test in tidal:
 d1 $ gracenotes 0.125 ("1 0 1 0" :: Pattern Bool) (n "c a f e" # sound "supermandolin")
