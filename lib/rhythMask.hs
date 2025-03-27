@@ -4,6 +4,25 @@ module Rhythmask where
 
 import Sound.Tidal.Context
 
+-- | Probabilistic mask: generates a Pattern Bool from a list of Doubles (0.0 to 1.0)
+probMaskPattern :: [Double] -> Pattern Bool
+probMaskPattern probs =
+  fastcat $ map (\p -> fmap (< p) (rand :: Pattern Double)) probs
+
+-- | Applies a probabilistic mask to a pattern
+rhythmaskProb :: Pattern a -> [Double] -> Pattern a
+rhythmaskProb pat probs = myFilterEvents pat (probMaskPattern probs)
+
+-- | Applies a transformation to masked-out events using a probabilistic mask
+rhythmaskProbWith :: Pattern a -> [Double] -> (Pattern a -> Pattern a) -> Pattern a
+rhythmaskProbWith pat probs transform =
+  let maskP    = probMaskPattern probs
+      notMaskP = fmap not maskP
+      kept         = myFilterEvents pat maskP
+      transformed  = myFilterEvents (transform pat) notMaskP
+  in stack [kept, transformed]
+
+-- | generates a random set of True/False (0/1) values to drop or keep beats.
 randomMaskString :: Int -> String
 randomMaskString n = unwords $ take n $ map (\x -> if even (x * 37 `mod` 7) then "1" else "0") [1..]
 

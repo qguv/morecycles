@@ -18,6 +18,12 @@ Steps of implementation:
 probability threshold, the event passes on to the final output, otherwise it is removed.
 ->Reconstruction of the Pattern: The remaining beats are reconstructed into a new TidalCycles pattern.
 
+Additional Functionality:
+-> Instead of passing a set of probability values, I am now passing a binary mask (e.g. [1 0 1 0]),
+where 1 is True and 0 is False. This determines which beats will be kept in a sequence and which
+ones will be dropped. However, there is a helper function at the beginning, that generates a random
+mask.
+
 \begin{code}
 {-# OPTIONS_GHC -Wno-name-shadowing #-}
 {-# OPTIONS_GHC -Wno-type-defaults #-}
