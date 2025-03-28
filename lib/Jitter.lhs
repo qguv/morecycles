@@ -13,6 +13,7 @@ randomized shifts to event start times.
 module Jitter where
 
 import Sound.Tidal.Pattern
+import Sound.Tidal.Context -- Import rand from Sound.Tidal.Context
 import System.Random
 import System.IO.Unsafe (unsafePerformIO) -- Import unsafePerformIO to extract a random value from an IO action.
 
@@ -25,8 +26,8 @@ making patterns more flexible and human-like.
 \begin{code}
 
 myModifyTime :: Pattern a -> (Double -> Double) -> Pattern a
-myModifyTime pat f = Pattern $ \s ->
-  map updateEvent (query pat s)
+myModifyTime pat f = Pattern $ \timeSpan ->
+  map updateEvent (query pat timeSpan)
   where
     -- updateEvent takes an event e and modifies its 'part' field.
     updateEvent e =
@@ -46,10 +47,19 @@ enabling effects like swing, groove, or subtle fluctuations in rhythm.
 
 \begin{code}
 
-jitterWith :: (Double -> Double) -> Pattern a -> Pattern a --takes an offset function and a pattern as input.
-jitterWith offsetFunc pat =
-  myModifyTime pat (\t -> t + offsetFunc t) --returns a new pattern with the time values modified by the offset function.
-
+jitterWith :: (Double -> Double) -> Pattern a -> Pattern a
+jitterWith offsetFunc pat = Pattern $ \timeSpan ->
+  let events = query pat timeSpan
+      randomOffsets = query (rand :: Pattern Double) timeSpan
+      updateEvent (e, r) =
+        let eventArc = part e
+            currentStart = start eventArc
+            timeOffset = offsetFunc r -- Apply the random value to the offset function
+            newStart = toRational (realToFrac currentStart + timeOffset)
+            newArc = eventArc { start = newStart }
+        in e { part = newArc }
+  in zipWith (curry updateEvent) events (map value randomOffsets)
+  
 \end{code}
 
 The function \texttt{jitter} introduces natural-sounding randomness by applying a small, 
@@ -59,10 +69,11 @@ a controlled range, it helps create a more dynamic, human-like feel in rhythmic 
 \begin{code}
 
 jitter :: Pattern a -> Double -> Pattern a
-jitter pat maxJitter =
-  jitterWith randomOffset pat
+jitter pat maxJitter
+  | maxJitter == 0 = pat -- No jitter when max jitter is 0
+  | otherwise = jitterWith randomOffset pat
   where
-    -- randomOffset ignores its input and returns a random Double between -maxJitter and maxJitter.
+    -- Generate a random offset between -maxJitter and maxJitter
     randomOffset :: Double -> Double
     randomOffset _ = unsafePerformIO (randomRIO (-maxJitter, maxJitter))
 
@@ -78,9 +89,9 @@ expressive and dynamic timing variations in TidalCycles patterns.
 
 \begin{code}
 jitterP :: Pattern a -> Pattern Double -> Pattern a
-jitterP pat maxJitterPat = Pattern $ \s ->
-    let contentEvents = query pat s
-        maxEvents     = query maxJitterPat s
+jitterP pat maxJitterPat = Pattern $ \timespan ->
+    let contentEvents = query pat timespan
+        maxEvents     = query maxJitterPat timespan
         getMaxForEvent e =
             let t = start (part e)  -- current event start time (Rational)
                 matching = filter (\e' ->
@@ -95,8 +106,8 @@ jitterP pat maxJitterPat = Pattern $ \s ->
         updateEvent e =
             let currentStart = start (part e)
                 m   = getMaxForEvent e
-                offset       = unsafePerformIO (randomRIO (-m, m))
-                newStart     = toRational (realToFrac currentStart + offset)
+                timeoffset       = unsafePerformIO (randomRIO (-m, m))
+                newStart     = toRational (realToFrac currentStart + timeoffset)
                 newArc       = (part e) { start = newStart }
             in e { part = newArc }
     in map updateEvent contentEvents
