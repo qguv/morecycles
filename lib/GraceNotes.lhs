@@ -22,8 +22,8 @@ import Data.List
 
 -- | gracenotes adds grace notes before events that match the mask pattern
 -- The Double parameter specifies how early the grace note starts
-gracenotes :: Double -> Pattern Bool -> Pattern a -> Pattern a
-gracenotes startTime mp p = stack [original, graceNotes] where
+gracenotes' :: Double -> Pattern Bool -> Pattern a -> Pattern a
+gracenotes' startTime mp p = stack [original, graceNotes] where
   original = p
   -- Get all events from the original pattern for a given state
   getOriginalEvents state = query p state
@@ -72,6 +72,21 @@ gracenotes startTime mp p = stack [original, graceNotes] where
     in result
 
 
+-- | A simpler version of gracenotes that automatically generates a random Boolean pattern
+-- and uses 0.125 as the grace note duration.
+gracenotes :: Pattern a -> Pattern a
+gracenotes p = Pattern{query=newQuery} where
+  -- Default grace note duration (1/8 of a cycle)
+  defaultDuration = 0.125
+  -- Use a non-deterministic approach similar to jumble
+  newQuery state = 
+    let randomMask = fastcat [pure True, pure False]
+    in query (gracenotes' defaultDuration randomMask p) state
+
 \end{code}
-p2e $ gracenotes 1 (s2p "[1 0 1 0]" :: Pattern Bool) (s2p "[a b c d]" :: Pattern String)
+
+Test in ghci:
+p2e $ gracenotes' 0.125 (s2p "[1 0 1 0]" :: Pattern Bool) (s2p "[a b c d]" :: Pattern String)
+p2e $ gracenotes (s2p "[a b c d]" :: Pattern String)
+Test in tidal:
 d1 $ gracenotes' 0.125 ("1 0 1 0" :: Pattern Bool) (n "c a f e" # sound "supermandolin")
