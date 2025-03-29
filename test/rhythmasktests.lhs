@@ -1,90 +1,148 @@
+\documentclass{article}
+\begin{document}
+
+This is the test suite for the \texttt{Rhythmask} module.  
+It uses \texttt{hspec} to test the following functions:
+
+\begin{itemize}
+  \item \textbf{parseMask}: Verifies that a mask string (e.g. \texttt{"1 0 1 0"}) is parsed into exactly one cycle of boolean values.
+  \item \textbf{myFilterEvents}: Ensures that filtering a pattern with a boolean mask returns the expected events.
+  \item \textbf{rhythmask}: Tests that applying a mask string retains only the events marked as \texttt{"1"}.
+  \item \textbf{rhythmaskWith}: Checks that the function applies a transformation to masked-out events and that kept events are output first.
+  \item \textbf{probMaskPattern}: Verifies that a probabilistic mask produces one cycle of the expected boolean values when given all zeros or all ones.
+  \item \textbf{rhythmaskProb}: Ensures that a probabilistic mask with zero probability filters out all events.
+  \item \textbf{rhythmaskProbWith}: Checks that the transformation is applied correctly for events with probability 0, with kept events output first.
+  \item \textbf{randomMaskString}: Confirms that the generated mask string contains the specified number of bits.
+\end{itemize}
+
 \begin{code}
+{-# LANGUAGE OverloadedStrings #-}
 module Main where
 
-import RhythMask
-import Sound.Tidal.Pattern
-import Sound.Tidal.Core
 import Test.Hspec
+import Rhythmask 
+import Sound.Tidal.Context
 
--- A basic pattern for testing
+----------------------------------------------------------------
+-- Helpers
+
+-- | Create a State covering one cycle for n events.
+stateFor :: Int -> State
+stateFor n = State (Arc 0 (fromIntegral n)) 0
+
+-- | A sample test pattern of 4 events.
 testPattern :: Pattern String
 testPattern = fromList ["a", "b", "c", "d"]
 
--- Debugging helpers
-debugEvent :: Show a => EventF (ArcF Time) a -> String
-debugEvent e =
-  "Event { start = " ++ show (start (part e)) ++
-  ", stop = " ++ show (stop (part e)) ++
-  ", value = " ++ show (value e) ++ " }"
-
-debugEvents :: Show a => [EventF (ArcF Time) a] -> String
-debugEvents events = "[" ++ unlines (map debugEvent events) ++ "]"
-
--- Parse mask tests
+----------------------------------------------------------------
+-- Test: parseMask
 testParseMask :: Spec
 testParseMask = describe "parseMask" $ do
-  it "correctly parses '1 0 1 0' into alternating True and False" $ do
-    let mask = parseMask "1 0 1 0"
-        state = State (Arc 0 4) 0
-        values = map value (query mask state)
+  it "parses '1 0 1 0' into [True, False, True, False] (one cycle)" $ do
+    let maskPat = parseMask "1 0 1 0"
+        -- Using take to capture only one cycle.
+        events  = take 4 (query maskPat (stateFor 4))
+        values  = map value events
     values `shouldBe` [True, False, True, False]
 
--- myFilterEvents tests
+----------------------------------------------------------------
+-- Test: myFilterEvents
 testMyFilterEvents :: Spec
 testMyFilterEvents = describe "myFilterEvents" $ do
-  it "keeps only events where the mask is True" $ do
-    let mask = parseMask "1 0 1 0"
-        filtered = myFilterEvents testPattern mask
-        state = State (Arc 0 4) 0
-        resultVals = map value (query filtered state)
-    resultVals `shouldBe` ["a", "c"]
+  it "filters a pattern using a boolean mask" $ do
+    let maskPat  = parseMask "1 0 1 0"  -- keep events (positions) 1 and 3
+        filtered = myFilterEvents testPattern maskPat
+        events   = take 4 (query filtered (stateFor 4))
+        values   = map value events
+    values `shouldBe` ["a", "c"]
 
--- rhythmask tests
+----------------------------------------------------------------
+-- Test: rhythmask
 testRhythmask :: Spec
 testRhythmask = describe "rhythmask" $ do
-  it "filters pattern using string mask correctly" $ do
-    let result = rhythmask testPattern "1 1 0 0"
-        state = State (Arc 0 4) 0
-        vals = map value (query result state)
-    vals `shouldBe` ["a", "b"]
+  it "applies a mask string to keep only events with mask '1' (1 - True, 0 - False)" $ do
+    let result = rhythmask testPattern "0 1 0 1"  -- keep events (positions) 2 and 4
+        events = take 4 (query result (stateFor 4))
+        values = map value events
+    values `shouldBe` ["b", "d"]
 
--- rhythmaskWith tests
+----------------------------------------------------------------
+-- Test: rhythmaskWith
 testRhythmaskWith :: Spec
 testRhythmaskWith = describe "rhythmaskWith" $ do
-  it "applies transformation to masked-out events" $ do
-    let result = rhythmaskWith testPattern "1 0 1 0" (fast 2)
-        state = State (Arc 0 4) 0
-        vals = map value (query result state)
-    vals `shouldSatisfy` \xs -> "a" `elem` xs && "c" `elem` xs
+  it "applies a transformation to masked-out events and outputs kept events first" $ do
+    -- With mask "1 0 1 0":
+    --   Kept events: events (positions) 1 and 3 ("a" and "c")
+    --   Transformed events: events (positions) 2 and 4 ("b!" and "d!")
+    let transform = fmap (\x -> x ++ "!")
+        result    = rhythmaskWith testPattern "1 0 1 0" transform
+        events    = take 4 (query result (stateFor 4))
+        values    = map value events
+    values `shouldBe` ["a", "c", "b!", "d!"]
 
--- probMaskPattern + rhythmaskProb tests
+----------------------------------------------------------------
+-- Test: probMaskPattern
+testProbMaskPattern :: Spec
+testProbMaskPattern = describe "probMaskPattern" $ do
+  it "produces all False when probability is 0" $ do
+    let pat    = probMaskPattern [0.0, 0.0, 0.0]
+        events = take 3 (query pat (stateFor 3))
+        values = map value events
+    values `shouldBe` [False, False, False]
+  it "produces all True when probability is 1" $ do
+    let pat    = probMaskPattern [1.0, 1.0, 1.0]
+        events = take 3 (query pat (stateFor 3))
+        values = map value events
+    values `shouldBe` [True, True, True]
+
+----------------------------------------------------------------
+-- Test: rhythmaskProb
 testRhythmaskProb :: Spec
 testRhythmaskProb = describe "rhythmaskProb" $ do
-  it "retains roughly correct proportion of events probabilistically" $ do
-    let pat = testPattern
-        probs = replicate 4 0.0
-        result = rhythmaskProb pat probs
-        state = State (Arc 0 4) 0
-        vals = map value (query result state)
-    vals `shouldBe` []  -- With all 0.0 probs, all should be masked out
+  it "filters out all events when probability is 0" $ do
+    let pat    = fromList ["a", "b", "c"]
+        result = rhythmaskProb pat [0.0, 0.0, 0.0]
+        events = take 3 (query result (stateFor 3))
+        values = map value events
+    values `shouldBe` []
 
--- rhythmaskProbWith test
+----------------------------------------------------------------
+-- Test: rhythmaskProbWith
 testRhythmaskProbWith :: Spec
 testRhythmaskProbWith = describe "rhythmaskProbWith" $ do
-  it "applies transformation to dropped events using probabilities" $ do
-    let pat = testPattern
-        probs = [1.0, 0.0, 1.0, 0.0]  -- keep 1st and 3rd
-        result = rhythmaskProbWith pat probs (slow 2)
-        state = State (Arc 0 4) 0
-        vals = map value (query result state)
-    vals `shouldSatisfy` \xs -> "a" `elem` xs && "c" `elem` xs
+  it "applies transformation to events with probability 0 and outputs kept events first" $ do
+    -- For probabilities [1.0, 0.0, 1.0]:
+    --   Kept events: events (positions) 1 and 3 ("a" and "c")
+    --   Transformed event: event (position) 2 ("b!")
+    let pat       = fromList ["a", "b", "c"]
+        transform = fmap (\x -> x ++ "!")
+        result    = rhythmaskProbWith pat [1.0, 0.0, 1.0] transform
+        events    = take 3 (query result (stateFor 3))
+        values    = map value events
+    values `shouldBe` ["a", "c", "b!"]
 
+----------------------------------------------------------------
+-- Test: randomMaskString
+testRandomMaskString :: Spec
+testRandomMaskString = describe "randomMaskString" $ do
+  it "generates a mask string with the specified number of bits" $ do
+    let n    = 5
+        s    = randomMaskString n
+        bits = words s
+    length bits `shouldBe` n
+    all (\b -> b == "0" || b == "1") bits `shouldBe` True
+
+----------------------------------------------------------------
+-- Main: Run all tests
 main :: IO ()
 main = hspec $ do
   testParseMask
   testMyFilterEvents
   testRhythmask
   testRhythmaskWith
+  testProbMaskPattern
   testRhythmaskProb
   testRhythmaskProbWith
+  testRandomMaskString
+
 \end{code}
