@@ -27,6 +27,3 @@ cabal.sandbox.config
 dist
 dist-*
 *.cabal
-stuff.txt
-.tidal
-test/jumble-haskell.hs
