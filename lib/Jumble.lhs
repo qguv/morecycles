@@ -15,6 +15,7 @@ module Jumble where
 import Sound.Tidal.Pattern
 import Sound.Tidal.UI
 import Sound.Tidal.Core
+import Data.List
 \end{code}
 
 \texttt{jumble} takes two patterns as input:
@@ -65,7 +66,7 @@ jumble' i mp p = stack [static, variable] where
       expandedEnd = fromInteger $ ceiling t1
       expandedArc = Arc expandedStart $ expandedEnd + (if expandedStart == expandedEnd then 1 else 0)
       expandedState = State expandedArc c
-      expandedEvents = oldQuery expandedState
+      expandedEvents = sortOn (\Event{part=Arc{start=t}} -> t) (oldQuery expandedState)
       narrow es = [e{part=Arc (max t0 p0) (min t1 p1)} | e@Event{part=Arc p0 p1} <- es, isIn (Arc t0 t1) (wholeStart e)]
 \end{code}
 
