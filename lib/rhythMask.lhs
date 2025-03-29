@@ -1,3 +1,8 @@
+\begin{code}
+{-# OPTIONS_GHC -Wno-name-shadowing #-}
+{-# OPTIONS_GHC -Wno-type-defaults #-}
+\end{code}
+
 "RhythMask": Probability-Based Masking
 The idea behind RhythMask is to create a rhythmic effect where some beats are 
 probabilistically dropped or kept each cycle, 
@@ -19,18 +24,37 @@ probability threshold, the event passes on to the final output, otherwise it is 
 ->Reconstruction of the Pattern: The remaining beats are reconstructed into a new TidalCycles pattern.
 
 Additional Functionality:
--> Instead of passing a set of probability values, I am now passing a binary mask (e.g. [1 0 1 0]),
+-> Instead of passing a set of probability values, I am passing a binary mask (e.g. [1 0 1 0]),
 where 1 is True and 0 is False. This determines which beats will be kept in a sequence and which
 ones will be dropped. However, there is a helper function at the beginning, that generates a random
 mask.
 
-\begin{code}
-{-# OPTIONS_GHC -Wno-name-shadowing #-}
-{-# OPTIONS_GHC -Wno-type-defaults #-}
-module Rhythmask where
 
+
+\begin{code}
+
+module Rhythmask where
 import Sound.Tidal.Context
 
+-- | Probabilistic mask: generates a Pattern Bool from a list of Doubles (0.0 to 1.0)
+probMaskPattern :: [Double] -> Pattern Bool
+probMaskPattern probs =
+  fastcat $ map (\p -> fmap (< p) (rand :: Pattern Double)) probs
+
+-- | Applies a probabilistic mask to a pattern
+rhythmaskProb :: Pattern a -> [Double] -> Pattern a
+rhythmaskProb pat probs = myFilterEvents pat (probMaskPattern probs)
+
+-- | Applies a transformation to masked-out events using a probabilistic mask
+rhythmaskProbWith :: Pattern a -> [Double] -> (Pattern a -> Pattern a) -> Pattern a
+rhythmaskProbWith pat probs transform =
+  let maskP    = probMaskPattern probs
+      notMaskP = fmap not maskP
+      kept         = myFilterEvents pat maskP
+      transformed  = myFilterEvents (transform pat) notMaskP
+  in stack [kept, transformed]
+
+-- | generates a random set of True/False (0/1) values to drop or keep beats.
 randomMaskString :: Int -> String
 randomMaskString n = unwords $ take n $ map (\x -> if even (x * 37 `mod` 7) then "1" else "0") [1..]
 
@@ -78,7 +102,5 @@ rhythmaskWith pat maskStr transform =
       kept         = myFilterEvents pat maskP
       transformed  = myFilterEvents (transform pat) notMaskP
   in stack [kept, transformed]
-
-
 
 \end{code}
