@@ -31,3 +31,11 @@ tests:
       - QuickCheck
       - hspec
       - tidal
+  rhythmasktests:
+    main: rhythmasktests.lhs
+    source-dirs: test
+    dependencies:
+      - morecycles
+      - QuickCheck
+      - hspec
+      - tidal
