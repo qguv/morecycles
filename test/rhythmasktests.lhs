@@ -3,16 +3,15 @@
 
 This is the test suite for the \texttt{Rhythmask} module.  
 It uses \texttt{hspec} to test the following functions:
-
 \begin{itemize}
-  \item \textbf{parseMask}: Verifies that a mask string (e.g. \texttt{"1 0 1 0"}) is parsed into exactly one cycle of boolean values.
-  \item \textbf{myFilterEvents}: Ensures that filtering a pattern with a boolean mask returns the expected events.
-  \item \textbf{rhythmask}: Tests that applying a mask string retains only the events marked as \texttt{"1"}.
-  \item \textbf{rhythmaskWith}: Checks that the function applies a transformation to masked-out events and that kept events are output first.
-  \item \textbf{probMaskPattern}: Verifies that a probabilistic mask produces one cycle of the expected boolean values when given all zeros or all ones.
-  \item \textbf{rhythmaskProb}: Ensures that a probabilistic mask with zero probability filters out all events.
-  \item \textbf{rhythmaskProbWith}: Checks that the transformation is applied correctly for events with probability 0, with kept events output first.
-  \item \textbf{randomMaskString}: Confirms that the generated mask string contains the specified number of bits.
+  \item \textbf{testParseMask}: Verifies that a mask string (e.g. \texttt{"1 0 1 0"}) is parsed into exactly one cycle of boolean values.
+  \item \textbf{testMyFilterEvents}: Ensures that filtering a pattern with a boolean mask returns the expected events.
+  \item \textbf{testRhythmask}: Tests that applying a mask string retains only the events marked as \texttt{"1"}.
+  \item \textbf{testRhythmaskWith}: Checks that the function applies a transformation to masked-out events.
+  \item \textbf{testProbMaskPattern}: Verifies that a probabilistic mask produces one cycle of the expected boolean values when given all zeros or all ones.
+  \item \textbf{testRhythmaskProb}: Ensures that a probabilistic mask with zero probability filters out all events.
+  \item \textbf{testRhythmaskProbWith}: Checks that the transformation is applied correctly for events with probability 0, with kept events output first.
+  \item \textbf{testRandomMaskString}: Confirms that the generated mask string contains the specified number of bits.
 \end{itemize}
 
 \begin{code}
