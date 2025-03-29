@@ -33,7 +33,7 @@ mask.
 
 \begin{code}
 
-module Rhythmask (
+module RhythMask (
   probMaskPattern,
   rhythmaskProb,
   rhythmaskProbWith,

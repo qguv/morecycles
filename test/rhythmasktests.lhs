@@ -19,7 +19,7 @@ It uses \texttt{hspec} to test the following functions:
 module Main where
 
 import Test.Hspec
-import Rhythmask 
+import RhythMask 
 import Sound.Tidal.Context
 
 ----------------------------------------------------------------
