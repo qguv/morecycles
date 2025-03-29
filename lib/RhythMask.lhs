@@ -33,7 +33,17 @@ mask.
 
 \begin{code}
 
-module RhythMask where
+module RhythMask (
+  -- Export these so your tests can use them
+  rhythmask,
+  parseMask,
+  rhythmaskWith,
+  probMaskPattern,
+  rhythmaskProb,
+  rhythmaskProbWith,
+  myFilterEvents,
+  randomMaskString
+) where
 import Sound.Tidal.Context
 
 -- | Probabilistic mask: generates a Pattern Bool from a list of Doubles (0.0 to 1.0)

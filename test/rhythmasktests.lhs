@@ -1,7 +1,7 @@
 \begin{code}
 module Main where
 
-import RhythMask (parseMask, myFilterEvents, rhythmask, rhythmaskWith, probMaskPattern, rhythmaskProb, rhythmaskProbWith)
+import RhythMask
 import Sound.Tidal.Pattern
 import Sound.Tidal.Core
 import Test.Hspec
