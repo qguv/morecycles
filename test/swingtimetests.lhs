@@ -1,17 +1,13 @@
  \subsubsection{Tests}
 
+\hide{
 \begin{code}
 {-# OPTIONS_GHC -Wno-orphans #-}
 module Main where
 
 import SwingTime
-import GraceNotes
 
 import TestUtils
-
-import Data.List
-
-import Debug.Trace
 
 import Sound.Tidal.Pattern
 import Sound.Tidal.Core
@@ -20,10 +16,9 @@ import Sound.Tidal.ParseBP
 import Test.Hspec
 import Test.QuickCheck
 \end{code}
+}
 
-
-First, we need to describe how to create arbitrary \texttt{Pattern} instances:
-
+\hide{
 \begin{code}
 instance (Arbitrary a) => Arbitrary (Pattern a) where
   arbitrary = sized m where
@@ -38,6 +33,7 @@ instance (Fractional a, Arbitrary a, Eq a) => Arbitrary (ArcF a) where
       x = resize (i `div` 2) arbitrary
       notZero n = if n == 0 then 1 else n
 \end{code}
+}
 
 We can now define our tests:
 
@@ -46,15 +42,34 @@ We can now define our tests:
 main :: IO ()
 main = hspec $ do
   describe "SwingTime" $ do
+
+\end{code}
+The first test checks that the function doesn't change the pattern when the mask is all zeros.
+
+\begin{code}
+
     it "shouldn't change the pattern when the mask is all zeros" $
       property $ \a -> compareP a 
         (swingtime 0.125 (parseBP_E "[0 0 0 0]") (parseBP_E "[a b c d]")) 
         (parseBP_E "[a b c d]" :: Pattern String)
 
+\end{code}
+
+The second test checks that the function doesn't make a difference what the swing amount is when the mask is all zeroes.
+
+\begin{code}
+
     it "shouldn't make a difference what the gracenote length is when the mask is all zeroes" $
       property $ \a -> compareP a 
         (swingtime 0.125 (parseBP_E "[0 0 0 0]") (parseBP_E "[a b c d]" :: Pattern String)) 
         (swingtime 0.25 (parseBP_E "[0 0 0 0]") (parseBP_E "[a b c d]" :: Pattern String))
+    
+\end{code}
+
+The third test checks that the function swings only those notes allowed by the mask.
+This is done by comparing the result of the function with the result of a strict query on the pre-defined expected pattern.
+
+\begin{code}
     
     it "should selectively add grace notes if the mask is not uniformly ones" $
       property $ \a m -> 
@@ -64,6 +79,11 @@ main = hspec $ do
       in compareP a 
           (strictQuery a $ swingtime 0.125 maskPattern (parseBP_E "[a b c d]"))
           (correctPatternTest3 mask)
+
+\end{code}
+
+\hide{
+\begin{code}
 
     where
       createNote (s, e, v) = 
@@ -106,11 +126,11 @@ main = hspec $ do
       }
 
 strictQuery :: Arc -> Pattern a -> Pattern a
-strictQuery arc pat  = Pattern { query = \st -> 
+strictQuery arcRange pat  = Pattern { query = \st -> 
   let 
     events = query pat st
     filteredEvents = filter (\e -> 
-      start (part e) <= stop arc && stop (part e) >= start arc) events
+      start (part e) <= stop arcRange && stop (part e) >= start arcRange) events
   in
     filteredEvents
 }
@@ -128,3 +148,6 @@ printPattern arcRange pat = unlines $ map showEvent $ queryArc pat arcRange
 
 
 \end{code}
+}
+
+Helper functions and correct patterns are excluded from the report because they are too long.

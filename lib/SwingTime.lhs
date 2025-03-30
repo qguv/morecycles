@@ -1,4 +1,4 @@
-\subsection{SwingTime (Milan & Gideon)}
+\subsection{SwingTime (Milan \& Gideon)}
 In Western music, 
 particularly in jazz and blues, swing refers to a rhythmic feel where alternate beats are slightly delayed,
 creating a "long-short" pattern instead of an evenly spaced beat structure. This gives the rhythm a more dynamic, groovy feel.
@@ -38,8 +38,8 @@ swingtime amt mp p = p {query = \st -> concatMap (applySwing mp st) (query p st)
               isTrue True = True
               isTrue _ = False
               swingShift = if shouldSwing then amt else 0
-              arc = Arc (startTime + swingShift) (endTime + swingShift)
-              event = if shouldSwing then ev {part = arc, whole = Just arc} else ev
+              arcTwo = Arc (startTime + swingShift) (endTime + swingShift)
+              event = if shouldSwing then ev {part = arcTwo, whole = Just arcTwo} else ev
               -- event = if shouldSwing then (Event arc arc (value ev) ) else ev
           in [event]
 

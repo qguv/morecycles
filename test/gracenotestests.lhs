@@ -17,8 +17,7 @@ import Test.QuickCheck
 \end{code}
 
 
-First, we need to describe how to create arbitrary \texttt{Pattern} instances:
-
+\hide{
 \begin{code}
 instance (Arbitrary a) => Arbitrary (Pattern a) where
   arbitrary = sized m where
@@ -33,8 +32,7 @@ instance (Fractional a, Arbitrary a, Eq a) => Arbitrary (ArcF a) where
       x = resize (i `div` 2) arbitrary
       notZero n = if n == 0 then 1 else n
 \end{code}
-
-We can now define our tests:
+}
 
 
 
@@ -44,18 +42,37 @@ main :: IO ()
 main = hspec $ do
   describe "GraceNotes" $ do
 
-    -- it "shouldn't change the pattern when the mask is zero" $
-    --   property $ \a -> compareP a (gracenotes 0 (parseBP_E "[0]") (parseBP_E "[a b c d]")) (parseBP_E "[a b c d]" :: Pattern String)
+\end{code}
+
+The first test checks that the function doesn't change the pattern when the mask is all zeros.
+When the mask is all zeros, the function should return the original pattern since no grace notes are added.
+
+\begin{code}
 
     it "shouldn't change the pattern when the mask is all zeros" $
       property $ \a -> compareP a 
         (gracenotes' 0.125 (parseBP_E "[0 0 0 0]") (parseBP_E "[a b c d]")) 
         (parseBP_E "[a b c d]" :: Pattern String)
+
+\end{code}
+
+The second test checks that the function doesn't make a difference what the gracenote length is when the mask is all zeroes.
+When the mask is all zeroes, the function should return the original pattern since no grace notes are added.
+
+\begin{code}
     
     it "shouldn't make a difference what the gracenote length is when the mask is all zeroes" $
       property $ \a -> compareP a 
         (gracenotes' 0.25 (parseBP_E "[0 0 0 0]") (parseBP_E "[a b c d]" :: Pattern String)) 
         (gracenotes' 0.5 (parseBP_E "[0 0 0 0]") (parseBP_E "[a b c d]")) 
+
+\end{code}
+
+The third test checks that the function adds grace notes for all events when the mask is all ones..
+When the mask is all ones, the function should add grace notes for all events in the pattern.
+This test tests them for a length of 1/8.
+
+\begin{code}
 
     it "should add grace notes for all events when the mask is all ones and the length is 1/8" $
       property $ \a -> counterexample
@@ -65,6 +82,13 @@ main = hspec $ do
           (gracenotes' 0.125 (parseBP_E "[1 1 1 1]") (parseBP_E "[a b c d]"))
           correctPatternTest3)
 
+\end{code}
+
+The fourth test checks that the function adds grace notes for all events that overlap when the length is 1/4.
+This test tests them for a length of 1/4.
+
+\begin{code}
+
     it "should add grace notes for all events that overlap when the length is 1/4" $
       property $ \a -> counterexample
         ("Actual (floating-point):\n" ++ printPattern a (gracenotes' 0.25 (parseBP_E "[1 1 1 1]") (parseBP_E "[a b c d]") :: Pattern String) ++
@@ -72,6 +96,13 @@ main = hspec $ do
         (compareP a 
           (gracenotes' 0.25 (parseBP_E "[1 1 1 1]") (parseBP_E "[a b c d]"))
           correctPatternTest4)
+
+\end{code}
+
+The fifth test checks the functionality of the mask.
+It creates random masks and tests if the grace notes are added correctly.
+
+\begin{code}
 
     it "should selectively add grace notes if the mask is not uniformly ones" $
       property $ \a m -> 
@@ -85,6 +116,10 @@ main = hspec $ do
           (gracenotes' 0.125 maskPattern (parseBP_E "[a b c d]"))
           (correctPatternTest5 mask))
 
+\end{code}
+
+\hide{
+\begin{code}
     where
       -- Create a pattern with explicit events having the exact timing we want
       createGraceNote (s, e, v) = 
@@ -192,9 +227,8 @@ printPattern arcRange pat = unlines $ map showEvent $ queryArc pat arcRange
     showEvent (Event {part = Arc s e, value = v}) =
       "(" ++ show (realToFrac s :: Double) ++ ">" ++ show (realToFrac e :: Double) ++ ")|" ++ show v
 
--- Helper function to shift a pattern to a different time range
-shiftPattern :: Time -> Time -> Pattern a -> Pattern a
-shiftPattern startTime endTime pat = 
-  compressArc (Arc startTime endTime) pat
-
 \end{code}
+}
+
+
+The correct patterns are excluded from the report because they are too long.
