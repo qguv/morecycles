@@ -50,8 +50,18 @@ tests:
       - QuickCheck
       - hspec
       - tidal
+
   gracenotes:
     main: gracenotestests.lhs
+    source-dirs: test
+    dependencies:
+      - morecycles
+      - QuickCheck
+      - hspec
+      - tidal
+
+  swingtime:
+    main: swingtimetests.lhs
     source-dirs: test
     dependencies:
       - morecycles

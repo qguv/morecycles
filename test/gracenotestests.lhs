@@ -47,12 +47,10 @@ main = hspec $ do
     -- it "shouldn't change the pattern when the mask is zero" $
     --   property $ \a -> compareP a (gracenotes 0 (parseBP_E "[0]") (parseBP_E "[a b c d]")) (parseBP_E "[a b c d]" :: Pattern String)
 
-
     it "shouldn't change the pattern when the mask is all zeros" $
       property $ \a -> compareP a 
         (gracenotes' 0.125 (parseBP_E "[0 0 0 0]") (parseBP_E "[a b c d]")) 
         (parseBP_E "[a b c d]" :: Pattern String)
-
     
     it "shouldn't make a difference what the gracenote length is when the mask is all zeroes" $
       property $ \a -> compareP a 
