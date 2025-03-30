@@ -40,8 +40,11 @@ main :: IO ()
 main = hspec $ do
   describe "Arrhythmia" $ do
 
-    it "should not change the pattern if the time shifts by 0" $
-      property $ \a -> compareP a (arrhythmiaUnsafe 0 $ s $ parseBP_E "bd bd hh") (s $ parseBP_E "bd bd hh")
+    it "should not change the pattern if the time shifts by 0" (
+      queryArc (arrhythmiaUnsafe 0 $ s $ parseBP_E "bd bd hh") (Arc 0 1)
+      ==
+      queryArc (s $ parseBP_E "bd bd hh") (Arc 0 1)
+      )
 
     it "should repeat a cycle every k cycles" $
       property $ \a nt ->
