@@ -68,3 +68,12 @@ tests:
       - QuickCheck
       - hspec
       - tidal
+
+  swingtime:
+    main: swingtimetests.lhs
+    source-dirs: test
+    dependencies:
+      - morecycles
+      - QuickCheck
+      - hspec
+      - tidal
