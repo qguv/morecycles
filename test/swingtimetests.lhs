@@ -15,11 +15,7 @@ import Sound.Tidal.ParseBP
 
 import Test.Hspec
 import Test.QuickCheck
-\end{code}
-}
 
-\hide{
-\begin{code}
 instance (Arbitrary a) => Arbitrary (Pattern a) where
   arbitrary = sized m where
     m n | n < 4 = listToPat . (:[]) <$> arbitrary
@@ -38,39 +34,33 @@ instance (Fractional a, Arbitrary a, Eq a) => Arbitrary (ArcF a) where
 We can now define our tests:
 
 \begin{code}
-
 main :: IO ()
 main = hspec $ do
   describe "SwingTime" $ do
-
 \end{code}
+
 The first test checks that the function doesn't change the pattern when the mask is all zeros.
 
 \begin{code}
-
     it "shouldn't change the pattern when the mask is all zeros" $
       property $ \a -> compareP a 
         (swingtime 0.125 (parseBP_E "[0 0 0 0]") (parseBP_E "[a b c d]")) 
         (parseBP_E "[a b c d]" :: Pattern String)
-
 \end{code}
 
 The second test checks that the function doesn't make a difference what the swing amount is when the mask is all zeroes.
 
 \begin{code}
-
     it "shouldn't make a difference what the gracenote length is when the mask is all zeroes" $
       property $ \a -> compareP a 
         (swingtime 0.125 (parseBP_E "[0 0 0 0]") (parseBP_E "[a b c d]" :: Pattern String)) 
         (swingtime 0.25 (parseBP_E "[0 0 0 0]") (parseBP_E "[a b c d]" :: Pattern String))
-
 \end{code}
 
 The third test checks that the function swings only those notes allowed by the mask.
 This is done by comparing the result of the function with the result of a strict query on the pre-defined expected pattern.
 
 \begin{code}
-
     it "should swing only those notes allowed by the mask" $
       property $ \a -> counterexample 
       ("Actual (floating-point):\n" ++ printPattern a (swingtime 0.125 (parseBP_E "[1 0 1 0]") (parseBP_E "[a b c d]" :: Pattern String)) ++ 
@@ -78,7 +68,6 @@ This is done by comparing the result of the function with the result of a strict
       (compareP a 
         (strictQuery a (swingtime 0.125 (parseBP_E "[1 0 1 0]") (parseBP_E "[a b c d]"))) 
         correctPatternTest3)
-
 \end{code}
 
 \hide{
@@ -140,7 +129,6 @@ printPattern arcRange pat = unlines $ map showEvent $ queryArc pat arcRange
   where
     showEvent (Event {part = Arc s e, value = v}) =
       "(" ++ show (realToFrac s :: Double) ++ ">" ++ show (realToFrac e :: Double) ++ ")|" ++ show v
-
 
 \end{code}
 }
