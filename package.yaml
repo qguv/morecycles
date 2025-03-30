@@ -42,6 +42,15 @@ tests:
       - tidal
       - random
 
+  arrhythmiatests:
+    main: arrhythmiatests.lhs
+    source-dirs: test
+    dependencies:
+      - morecycles
+      - QuickCheck
+      - hspec
+      - tidal
+
   rhythmasktests:
     main: rhythmasktests.lhs
     source-dirs: test
@@ -50,6 +59,7 @@ tests:
       - QuickCheck
       - hspec
       - tidal
+
   gracenotes:
     main: gracenotestests.lhs
     source-dirs: test
