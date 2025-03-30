@@ -1,3 +1,5 @@
+\subsection{PolyShift}
+
 \begin{code}
 module PolyShift where
 
