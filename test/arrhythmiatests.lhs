@@ -6,7 +6,6 @@
 module Main where
 
 import Arrhythmia
-import TestUtils
 
 import Sound.Tidal.Params
 import Sound.Tidal.Pattern
@@ -22,16 +21,16 @@ import Data.Ratio
 \begin{code}
 instance (Arbitrary a) => Arbitrary (Pattern a) where
   arbitrary = sized m where
-    m n | n < 4 = listToPat . (:[]) <$> arbitrary
-    m n = fastCat <$> oneof [ sequence [resize (n `div` 2) arbitrary, resize (n `div` 2) arbitrary]
-      , sequence [resize (n `div` 2) arbitrary, resize (n `div` 2) arbitrary, resize (n `div` 2) arbitrary]
-      , sequence [resize (n `div` 2) arbitrary, resize (n `div` 2) arbitrary, resize (n `div` 2) arbitrary, resize (n `div` 2) arbitrary] ]
+    m nn | nn < 4 = listToPat . (:[]) <$> arbitrary
+    m nn = fastCat <$> oneof [ sequence [resize (nn `div` 2) arbitrary, resize (nn `div` 2) arbitrary]
+      , sequence [resize (nn `div` 2) arbitrary, resize (nn `div` 2) arbitrary, resize (nn `div` 2) arbitrary]
+      , sequence [resize (nn `div` 2) arbitrary, resize (nn `div` 2) arbitrary, resize (nn `div` 2) arbitrary, resize (nn `div` 2) arbitrary] ]
 
 instance (Fractional a, Arbitrary a, Eq a) => Arbitrary (ArcF a) where
   arbitrary = sized m where
     m i = Arc 0 . notZero <$> x where
       x = resize (i `div` 2) arbitrary
-      notZero n = if n == 0 then 1 else n
+      notZero nn = if nn == 0 then 1 else nn
 
 \end{code}
 
