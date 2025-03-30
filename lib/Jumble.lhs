@@ -9,6 +9,7 @@ It would be nice if musicians could specify which beats are important,
 allowing the rest to vary automatically.
 We call this function \texttt{jumble}.
 
+\hide{
 \begin{code}
 module Jumble where
 
@@ -17,6 +18,7 @@ import Sound.Tidal.UI
 import Sound.Tidal.Core
 import Data.List
 \end{code}
+}
 
 \texttt{jumble} takes two patterns as input:
 a content pattern (`Pattern a`)

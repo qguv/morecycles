@@ -7,14 +7,14 @@ occur from the time $1-r$ to 1 in the original cycle are delayed until the third
 causes the originally patern to become progressively less in sync with its time signature
 and creates interesting polyrhythms when combined with other patterns with the same signature.
  
+\hide{
 \begin{code}
-
 module Arrhythmia where
 import Sound.Tidal.Context
 import Data.Maybe
 import Data.Either()
-
 \end{code}
+}
 
 First we provide a function that queries a pattern during its first cycle to determine if
 splitting the pattern into $n$ pieces (where $n$ is the denominator of our time input) is possible. 

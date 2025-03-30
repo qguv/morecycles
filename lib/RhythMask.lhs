@@ -26,12 +26,14 @@ The main function that handles this is \texttt{rhythmaskProb}. It applies a prob
 
 The steps and the function described above define one of the main functionalities of the RhythMask function. However, this is relatively easy to do in Tidal using \texttt{fastcat} and \texttt{fmap}. So, in order to expand on this, I added addtional features to the code that makes sense, while staying true to the core idea of RhythMask. These functions are \texttt{rhythmaskProbWith}, \texttt{rhythmask} and \texttt{rhythmaskWith}.
 
+\hide{
 \begin{code}
 {-# OPTIONS_GHC -Wno-name-shadowing #-}
 {-# OPTIONS_GHC -Wno-type-defaults #-}
 module RhythMask where
 import Sound.Tidal.Context
 \end{code}
+}
 
 The probabilistic mask is defined by the function \texttt{probMaskPattern}. The \texttt{fmap} here applies the function (< p) to each random value in rand, resulting in True with probability p (since a random number between 0 and 1 is < p with probability p). The \texttt{fastcat} method takes a list [Pattern a] and returns Pattern a. It takes a list of patterns and concatenates them in time, cycling through them faster than \texttt{cat}. It divides one cycle equally among the patterns, so if you pass 4 patterns, each one gets 1/4 of a cycle.
 \hide{

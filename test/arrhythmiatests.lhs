@@ -1,5 +1,6 @@
 \subsubsection{Tests}
 
+\hide{
 \begin{code}
 {-# OPTIONS_GHC -Wno-orphans #-}
 module Main where
@@ -15,7 +16,10 @@ import Sound.Tidal.ParseBP
 import Test.Hspec
 import Test.QuickCheck
 import Data.Ratio
+\end{code}
+}
 
+\begin{code}
 instance (Arbitrary a) => Arbitrary (Pattern a) where
   arbitrary = sized m where
     m n | n < 4 = listToPat . (:[]) <$> arbitrary

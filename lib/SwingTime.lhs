@@ -7,13 +7,13 @@ The \texttt{swing} function allows musicians to apply this effect by defining wh
 This is controlled using a mask pattern, which determines which beats remain steady and which are swung.
 
 
+\hide{
 \begin{code}
 module SwingTime where
 
 import Sound.Tidal.Pattern
-
-
 \end{code}
+}
 
 \texttt{swing} takes a rational number, a mask pattern and a pattern to apply the swing to as arguments.
 The rational number is the swing amount, which is the amount of time to shift the beat.

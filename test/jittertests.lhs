@@ -4,17 +4,18 @@ To verify the functionality of the \texttt{jitter} function,
 we will create test cases that ensure the jitter function doesnt completely disrupt the rhythm 
 and that the overall structure of the pattern remains intact.
 
+\hide{
 \begin{code}
-
 module Main where
 import Jitter (jitter, jitterWith, jitterP)
 import Sound.Tidal.Pattern
 import Sound.Tidal.Core
 
 import Test.Hspec -- Import Hspec for writing our test suite.
+\end{code}
+}
 
--- | A simple test pattern created using 'fromList'.
--- This pattern has three events with values "a", "b", and "c".
+\begin{code}
 testPattern :: Pattern String
 testPattern = fromList ["a", "b", "c"]
 \end{code}

@@ -9,6 +9,7 @@ allowing each event to slightly vary in timing while still maintaining the overa
 This function, which we call \texttt{jitter}, enables such organic fluctuations by introducing small, 
 randomized shifts to event start times.
 
+\hide{
 \begin{code}
 module Jitter where
 
@@ -16,8 +17,8 @@ import Sound.Tidal.Pattern
 import Sound.Tidal.Context -- Import rand from Sound.Tidal.Context
 import System.Random
 import System.IO.Unsafe (unsafePerformIO) -- Import unsafePerformIO to extract a random value from an IO action.
-
 \end{code}
+}
 
 The function \texttt{myModifyTime} enables precise timing modifications by applying a transformation function to the start 
 time of each event in a pattern. It works by querying all events within a given time span and then updating each event's timing arc. 

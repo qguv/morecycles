@@ -12,6 +12,7 @@ a content pattern (Pattern a) and a mask pattern (Pattern Bool).
 The function produces an output pattern where any event that overlaps with a `True` in the mask pattern
 is duplicated with an additional grace note occurring just before it.
 
+\hide{
 \begin{code}
 module GraceNotes where
 
@@ -19,9 +20,9 @@ import Sound.Tidal.Pattern
 import Sound.Tidal.UI
 import Sound.Tidal.Core
 import Data.List
-
-
 \end{code}
+}
+
 the function \texttt{gracenotes} takes as input a Time variable, a Pattern Bool, and an original Pattern. The output is the resulting pattern with grace notes added.
 The grace notes are added to the notes that match the mask pattern.
 The Double parameter specifies how early the grace note starts, relative to the main note.

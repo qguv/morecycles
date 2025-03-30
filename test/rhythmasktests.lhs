@@ -1,5 +1,7 @@
 \subsubsection{Tests}
 The test suite validates the behavior of RhythMask, testing the performance of not only the main event manipulation functions, but also the helper functions that are responsible for filtering events and generating masks (Boolean and probabilistic both). The tests are written using \texttt{hspec} and \texttt{QuickCheck}.
+
+\hide{
 \begin{code}
 {-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -Wno-type-defaults #-}
@@ -13,6 +15,7 @@ import System.Random (randomRIO)
 import RhythMask
 import Sound.Tidal.Context
 \end{code}
+}
 
 \begin{code}
 -- Helpers
@@ -153,6 +156,7 @@ testRandomMaskString = describe "randomMaskString" $
     property prop_randomMaskString_valid
 \end{code}
 
+\hide{
 \begin{code}
 main :: IO ()
 main = hspec $ do
@@ -165,3 +169,4 @@ main = hspec $ do
   testRhythmaskProbWith
   testRandomMaskString
 \end{code}
+}
