@@ -152,7 +152,11 @@ To test and see how \texttt{jitter} and \texttt{jitterP} work, one can follow th
 
   \item \textbf{Test the Variable Jitter Function:}  
         Apply the \texttt{jitterP} function to a pattern using a dynamic maximum jitter value derived from a pattern. For example:  
-        \verb|d1 $ jitterP (sound "bd sn cp hh") (range 0.01 0.05 sine)| \\
+        \verb|d1|
+        \verb|$ jitterP|
+        \verb|(sound "bd sn cp hh")|
+        \verb|(range 0.01 0.05 sine)|
+        \\
         Here, the maximum jitter value varies between 0.01 and 0.05 cycles following a sine wave, so the random shift applied to each event is determined by the 
         corresponding value in this pattern.
 
