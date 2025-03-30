@@ -1,4 +1,4 @@
-\subsection{arrhythmia}
+\subsection{Arrhythmia (Jay)}
 
 This function takes a \texttt{ControlPattern} and a \texttt{Time} $r$ and returns
 another pattern that plays normally during its first its first cycle and then 
