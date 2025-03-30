@@ -118,6 +118,10 @@ It creates random masks and tests if the grace notes are added correctly.
           (gracenotes' 0.125 maskPattern (parseBP_E "[a b c d]"))
           (correctPatternTest5 mask))
 
+\end{code}
+
+\hide{
+\begin{code}
     where
       -- Create a pattern with explicit events having the exact timing we want
       createGraceNote (s, e, v) = 
@@ -219,15 +223,18 @@ It creates random masks and tests if the grace notes are added correctly.
           mainEvents ++ relevantGraceNotes
       }
 
+\end{code}
+}
+
+A helper function to print the patterns:
+\begin{code}
+
 printPattern :: (Show a) => Arc -> Pattern a -> String
 printPattern arcRange pat = unlines $ map showEvent $ queryArc pat arcRange
   where
     showEvent (Event {part = Arc s e, value = v}) =
       "(" ++ show (realToFrac s :: Double) ++ ">" ++ show (realToFrac e :: Double) ++ ")|" ++ show v
 
--- Helper function to shift a pattern to a different time range
-shiftPattern :: Time -> Time -> Pattern a -> Pattern a
-shiftPattern startTime endTime pat = 
-  compressArc (Arc startTime endTime) pat
-
 \end{code}
+
+The correct patterns are excluded from the report because they are too long.

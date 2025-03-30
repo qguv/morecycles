@@ -1,4 +1,4 @@
-\subsection{Gracenotes (Milan & Gideon)}
+\subsection{Gracenotes (Milan \& Gideon)}
 
 In Western music, 
 grace notes are quick, ornamental notes that precede a main note, adding expressiveness and variation.
