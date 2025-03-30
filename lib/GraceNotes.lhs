@@ -20,10 +20,16 @@ import Sound.Tidal.UI
 import Sound.Tidal.Core
 import Data.List
 
-{--
-gracenotes adds grace notes before events that match the mask pattern
-The Double parameter specifies how early the grace note starts
---}
+
+\end{code}
+the function gracenotes takes as input a Time variable, a Pattern Bool, and an original Pattern. The output is the resulting pattern with grace notes added.
+The grace notes are added to the notes that match the mask pattern.
+The Double parameter specifies how early the grace note starts, relative to the main note.
+So a grace note with offset 0.125 starts 1/8th of a cycle before the main note, and ends when the main note starts.
+The pitch of the grace note is always the same as the next note in the original pattern.
+This, will wrap around to the next note in the pattern if the end of the pattern is reached.
+\begin{code}
+
 gracenotes' :: Time -> Pattern Bool -> Pattern a -> Pattern a
 gracenotes' offset mp p = stack [original, graceNotes] where
   original = p
@@ -88,8 +94,9 @@ gracenotes p = Pattern{query=newQuery} where
 
 \end{code}
 
-Test in ghci:
+To test this functionality manually, you can use the following commands;
+In the ghci terminal when purely working with patterns:
 p2e $ gracenotes' 0.125 (s2p "[1 0 1 0]" :: Pattern Bool) (s2p "[a b c d]" :: Pattern String)
 p2e $ gracenotes (s2p "[a b c d]" :: Pattern String)
-Test in tidal:
+When working with tidal, producing sounds:
 d1 $ gracenotes' 0.125 ("1 0 1 0" :: Pattern Bool) (n "c a f e" # sound "supermandolin")
