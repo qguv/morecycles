@@ -223,12 +223,6 @@ It creates random masks and tests if the grace notes are added correctly.
           mainEvents ++ relevantGraceNotes
       }
 
-\end{code}
-}
-
-A helper function to print the patterns:
-\begin{code}
-
 printPattern :: (Show a) => Arc -> Pattern a -> String
 printPattern arcRange pat = unlines $ map showEvent $ queryArc pat arcRange
   where
@@ -236,5 +230,7 @@ printPattern arcRange pat = unlines $ map showEvent $ queryArc pat arcRange
       "(" ++ show (realToFrac s :: Double) ++ ">" ++ show (realToFrac e :: Double) ++ ")|" ++ show v
 
 \end{code}
+}
+
 
 The correct patterns are excluded from the report because they are too long.
