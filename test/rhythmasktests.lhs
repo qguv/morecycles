@@ -30,7 +30,7 @@ import Sound.Tidal.Context
 -- Helpers
 
 stateFor :: Int -> State
-stateFor n = State (Arc 0 (fromIntegral n)) 0
+stateFor numEvents = State (Arc 0 (fromIntegral numEvents)) 0
 
 randomMaskStringIO :: Int -> IO String
 randomMaskStringIO n = unwords <$> replicateM n (randomRIO (0 :: Int, 1) >>= \b -> return (show b))
