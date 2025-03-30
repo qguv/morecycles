@@ -11,6 +11,8 @@ import TestUtils
 
 import Data.List
 
+import Debug.Trace
+
 import Sound.Tidal.Pattern
 import Sound.Tidal.Core
 import Sound.Tidal.ParseBP
@@ -54,13 +56,14 @@ main = hspec $ do
         (swingtime 0.125 (parseBP_E "[0 0 0 0]") (parseBP_E "[a b c d]" :: Pattern String)) 
         (swingtime 0.25 (parseBP_E "[0 0 0 0]") (parseBP_E "[a b c d]" :: Pattern String))
     
-    it "should swing only those notes allowed by the mask" $
-      property $ \a -> counterexample 
-      ("Actual (floating-point):\n" ++ printPattern a (swingtime 0.125 (parseBP_E "[1 0 1 0]") (parseBP_E "[a b c d]" :: Pattern String)) ++ 
-        "Expected (floating-point):\n" ++ printPattern a correctPatternTest3)
-      (compareP a 
-        (strictQuery a (swingtime 0.125 (parseBP_E "[1 0 1 0]") (parseBP_E "[a b c d]"))) 
-        correctPatternTest3)
+    it "should selectively add grace notes if the mask is not uniformly ones" $
+      property $ \a m -> 
+      let
+        mask = take 4 (m ++ repeat False) :: [Bool]
+        maskPattern = listToPat mask :: Pattern Bool
+      in compareP a 
+          (strictQuery a $ swingtime 0.125 maskPattern (parseBP_E "[a b c d]"))
+          (correctPatternTest3 mask)
 
     where
       createNote (s, e, v) = 
@@ -71,11 +74,8 @@ main = hspec $ do
           Sound.Tidal.Pattern.context = Context []
       }
       
-      correctPatternTest3 = Pattern { query = \st -> 
+      correctPatternTest3 mask = Pattern { query = \st -> 
         let 
-          -- Original pattern events
-          mainEvents = query (parseBP_E "[~ b ~ d]" :: Pattern String) st
-
           -- Determine which cycles are being queried
           arcStart = start (arc st)
           arcEnd = stop (arc st)
@@ -83,11 +83,18 @@ main = hspec $ do
           endCycle = ceiling arcEnd - 1 :: Int
           
           swungNotesForCycle c =
-            [
-              createNote (0.125 + fromIntegral c, 0.375 + fromIntegral c, "a"),
-              createNote (0.625 + fromIntegral c, 0.875 + fromIntegral c, "c")
-            ]
-          
+            concat $
+              zipWith (\m (s, e, v) -> if m then [createNote (s + fromIntegral c, e + fromIntegral c, v)] else [])
+              mask
+              [ (0.125, 0.375, "a"),
+                (0.375, 0.625, "b"),
+                (0.625, 0.875, "c"),
+                (0.875, 1.125, "d")
+              ]
+
+          mainPattern = ("[" ++ (concatMap (\(m,n) -> if not m then n ++ " " else "~ ") $ zipWith (\m n -> (m,n)) (mask) [ "a", "b", "c", "d" ]) ++ "]")
+          mainEvents = query (parseBP_E d) st
+
           -- Generate grace notes for all cycles in the query range
           allSwungNotes = concatMap swungNotesForCycle [startCycle..endCycle]
           
