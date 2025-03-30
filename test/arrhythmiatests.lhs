@@ -4,7 +4,7 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 module Main where
 
-import Jumble
+import Arrhythmia
 import TestUtils
 
 import Sound.Tidal.Pattern
@@ -13,11 +13,7 @@ import Sound.Tidal.ParseBP
 
 import Test.Hspec
 import Test.QuickCheck
-\end{code}
 
-First, we need to describe how to create arbitrary \texttt{Pattern} instances:
-
-\begin{code}
 instance (Arbitrary a) => Arbitrary (Pattern a) where
   arbitrary = sized m where
     m n | n < 4 = listToPat . (:[]) <$> arbitrary
@@ -30,16 +26,23 @@ instance (Fractional a, Arbitrary a, Eq a) => Arbitrary (ArcF a) where
     m i = Arc 0 . notZero <$> x where
       x = resize (i `div` 2) arbitrary
       notZero n = if n == 0 then 1 else n
+
 \end{code}
 
-We can now define our tests:
+Here, we define two tests for arrhythmia. The first checks that shift the time by 0 returns the same
+pattern, and the second tests if the pattern eventually repeats the same cycle.
 
 \begin{code}
 
 main :: IO ()
 main = hspec $ do
-  describe "Jumble" $ do
+  describe "Arrhythmia" $ do
 
-    it "" $
-      property $ \a -> compareP a (jumble' 1 (parseBP_E "[0]") (parseBP_E "[a b]")) (parseBP_E "[b a]" :: Pattern String)
+    it "should not change the pattern if the time shifts by 0" $
+      property $ \a -> compareP a (arrhythmiaUnsafe 0 $ s $ parseBP_E "bd bd hh") (s $ parseBP_E "bd bd hh")
+    
+    it "should repeat a cycle every k cycles" $
+      property $ \a n -> (queryArc a $ arrhythmiaUnsafe n $ s $ parseBP_E "bd bd hh")
+       == (queryArc newArc $ arrhythmiaUnsafe n $ s $ parseBP_E "bd bd hh") where
+        newArc = Arc (arcStart a * (denominator n)) ((arcStart a * (denominator n)) + (arcEnd a - arcStart a))
 \end{code}
