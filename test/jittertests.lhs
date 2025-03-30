@@ -1,4 +1,4 @@
-\subsection*{Jitter Test Cases}
+\subsubsection{Jitter Test Cases}
 
 To verify the functionality of the \texttt{jitter} function, 
 we will create test cases that ensure the jitter function doesnt completely disrupt the rhythm 
