@@ -26,7 +26,7 @@ import Sound.Tidal.Context
 
 -- | Create a State covering one cycle for n events.
 stateFor :: Int -> State
-stateFor n = State (Arc 0 (fromIntegral n)) 0
+stateFor numEvents = State (Arc 0 (fromIntegral numEvents)) 0
 
 -- | A sample test pattern of 4 events.
 testPattern :: Pattern String
@@ -98,7 +98,7 @@ testProbMaskPattern = describe "probMaskPattern" $ do
 testRhythmaskProb :: Spec
 testRhythmaskProb = describe "rhythmaskProb" $ do
   it "filters out all events when probability is 0" $ do
-    let pat    = fromList ["a", "b", "c"]
+    let pat    = fromList ["a", "b", "c"] :: Pattern String
         result = rhythmaskProb pat [0.0, 0.0, 0.0]
         events = take 3 (query result (stateFor 3))
         values = map value events
@@ -124,10 +124,10 @@ testRhythmaskProbWith = describe "rhythmaskProbWith" $ do
 testRandomMaskString :: Spec
 testRandomMaskString = describe "randomMaskString" $ do
   it "generates a mask string with the specified number of bits" $ do
-    let n    = 5
-        s    = randomMaskString n
-        bits = words s
-    length bits `shouldBe` n
+    let numBits = 5
+        maskStr = randomMaskString numBits
+        bits = words maskStr
+    length bits `shouldBe` numBits
     all (\b -> b == "0" || b == "1") bits `shouldBe` True
 
 ----------------------------------------------------------------
