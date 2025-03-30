@@ -7,12 +7,14 @@ module Main where
 import Arrhythmia
 import TestUtils
 
+import Sound.Tidal.Params
 import Sound.Tidal.Pattern
 import Sound.Tidal.Core
 import Sound.Tidal.ParseBP
 
 import Test.Hspec
 import Test.QuickCheck
+import Data.Ratio
 
 instance (Arbitrary a) => Arbitrary (Pattern a) where
   arbitrary = sized m where
@@ -42,7 +44,7 @@ main = hspec $ do
       property $ \a -> compareP a (arrhythmiaUnsafe 0 $ s $ parseBP_E "bd bd hh") (s $ parseBP_E "bd bd hh")
     
     it "should repeat a cycle every k cycles" $
-      property $ \a n -> (queryArc a $ arrhythmiaUnsafe n $ s $ parseBP_E "bd bd hh")
-       == (queryArc newArc $ arrhythmiaUnsafe n $ s $ parseBP_E "bd bd hh") where
-        newArc = Arc (arcStart a * (denominator n)) ((arcStart a * (denominator n)) + (arcEnd a - arcStart a))
+      property $ \a n -> queryArc a $ arrhythmiaUnsafe n $ (s . parseBP_E) "bd bd hh"
+       == queryArc newArc $ arrhythmiaUnsafe n $ (s . parseBP_E) "bd bd hh" where
+        newArc = Arc (arcStart a * denominator n) ((arcStart a * denominator n) + (arcEnd a - arcStart a))
 \end{code}
