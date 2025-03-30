@@ -42,9 +42,13 @@ main = hspec $ do
 
     it "should not change the pattern if the time shifts by 0" $
       property $ \a -> compareP a (arrhythmiaUnsafe 0 $ s $ parseBP_E "bd bd hh") (s $ parseBP_E "bd bd hh")
-    
+
     it "should repeat a cycle every k cycles" $
-      property $ \a n -> queryArc a (arrhythmiaUnsafe n $ s $ parseBP_E "bd bd hh")
-       == queryArc newArc (arrhythmiaUnsafe n $ s $ parseBP_E "bd bd hh") where
-        newArc = Arc (arcStart a * (denominator n)) ((arcStart a * (denominator n)) + (arcEnd a - arcStart a))
+      property $ \a nt ->
+        queryArc (arrhythmiaUnsafe nt $ s $ parseBP_E "bd bd hh") a ==
+        queryArc (arrhythmiaUnsafe nt $ s $ parseBP_E "bd bd hh") (newArc a nt)
+        where
+          newArc :: Arc -> Time -> Arc
+          newArc a nu = Arc (arcStart a * (denominator nu % 1)) ((arcStart a * (denominator nu % 1)) + (arcEnd a - arcStart a))
+
 \end{code}
