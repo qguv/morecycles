@@ -29,34 +29,19 @@ The steps and the function described above define one of the main functionalitie
 \begin{code}
 {-# OPTIONS_GHC -Wno-name-shadowing #-}
 {-# OPTIONS_GHC -Wno-type-defaults #-}
-\end{code}
-
-I initially had some trouble with exporting functions because of VSCode, so I manually defined the functions to be exported. I know that all functions are exported by default, but I kept the verbose explicit exports in place so that I do not run into the same problem in the future.
-\begin{code}
-
-module RhythMask (
-  probMaskPattern,
-  rhythmaskProb,
-  rhythmaskProbWith,
-  randomMaskString,
-  parseMask,
-  myFilterEvents,
-  rhythmask,
-  rhythmaskWith
-) where
-
+module RhythMask where
 import Sound.Tidal.Context
-
 \end{code}
 
 The probabilistic mask is defined by the function \texttt{probMaskPattern}. The \texttt{fmap} here applies the function (< p) to each random value in rand, resulting in True with probability p (since a random number between 0 and 1 is < p with probability p). The \texttt{fastcat} method takes a list [Pattern a] and returns Pattern a. It takes a list of patterns and concatenates them in time, cycling through them faster than \texttt{cat}. It divides one cycle equally among the patterns, so if you pass 4 patterns, each one gets 1/4 of a cycle.
-
+\hide{
 \begin{code}
 -- | Probabilistic mask: generates a Pattern Bool from a list of Doubles (0.0 to 1.0)
 probMaskPattern :: [Double] -> Pattern Bool
 probMaskPattern probs =
   fastcat $ map (\p -> fmap (< p) (rand :: Pattern Double)) probs
 \end{code}
+}
 
 The \texttt{rhythmaskProb} is the main function that takes a probabilistic mask and applies it to a sequence of events in Tidal.
 
@@ -83,29 +68,33 @@ rhythmaskProbWith pat probs transform =
   in stack [kept, transformed]
 \end{code}
 
-A sample input for this function can be defined as follows (The "gain" transformation in Tidal controls the amplitude of an event using a power function with a default value of 1. Values lower than 1 make the event (sound) quieter.):
+Sample input(The "gain" transformation in Tidal controls the amplitude of an event using a power function with a default value of 1. Values lower than 1 make the event (sound) quieter.):
 \begin{code}
 --d1 $ rhythmaskProbWith (sound "bd sn bd sn") [0.6, 0.4, 0.7, 0.2] (# gain 0.3)
 \end{code}
 
-
+\hide{
 \begin{code}
 -- | generates a random set of True/False (0/1) values to drop or keep beats.
 randomMaskString :: Int -> String
 randomMaskString n = unwords $ take n $ map (\x -> if even (x * 37 `mod` 7) then "1" else "0") [1..]
 \end{code}
+}
 
 \texttt{parseMask} converts a binary mask string (e.g. "1 0 1 0") into a Pattern Bool. It splits the string into words, maps "1" to True and any other word to False, cycles the resulting list, and then limits it to one cycle using take.
 
+\hide{
 \begin{code}
 parseMask :: String -> Pattern Bool
 parseMask s =
   let bits = map (== "1") (words s)
   in fastcat (map pure bits)
 \end{code}
+}
 
 \texttt{myFilterEvents} takes a pattern 'pat' and a boolean mask pattern 'maskPat' and produces a new pattern that only keeps events where the mask is True. (It extracts the events from both patterns at a given time, zips them, and keeps an event if its corresponding mask event (extracted via value) is True.)
 
+\hide{
 \begin{code}
 myFilterEvents :: Pattern a -> Pattern Bool -> Pattern a
 myFilterEvents pat maskPat = Pattern $ \s ->
@@ -114,6 +103,8 @@ myFilterEvents pat maskPat = Pattern $ \s ->
       filtered = [ e | (e, b) <- zip es bs, value b ]
   in filtered
 \end{code}
+}
+
 
 \texttt{rhythmask} applies a mask (given as a string like "1 0 1 0") to a pattern. Only events corresponding to a True (or "1") in the mask will be kept.
 
@@ -122,21 +113,14 @@ rhythmask :: Pattern a -> String -> Pattern a
 rhythmask pat maskStr = myFilterEvents pat (parseMask maskStr)
 \end{code}
 
-The \texttt{randomMaskString} function is used to generate a random list of 1s and 0s, however, it is also possible to manually define the list. A sample input for this function for both cases can be defined as follows :
+The \texttt{randomMaskString} function is used to generate a random list of 1s and 0s, however, it is also possible to manually define the list. A sample input:
 \begin{code}
 --d1 $ rhythmask (sound (parseBP_E "hh arpy bd sn bd hh arpy sn hh bd")) (randomMaskString 10)
-----d1 $ rhythmask (sound (parseBP_E "hh arpy bd sn bd hh arpy sn hh bd")) [1 1 0 1 1 0 0 0 1 0]
+--d1 $ rhythmask (sound (parseBP_E "hh arpy bd sn bd hh arpy sn hh bd")) [1 1 0 1 1 0 0 0 1 0]
 \end{code}
 
 
-\texttt{rhythmaskWith} applies a transformation to the events that are masked out.
-It splits the pattern into two parts:
-\begin{itemize}
-    \item 'kept' events where the mask is True,
-    \item 'transformed' events (obtained by applying the given transformation)
-   where the mask is False.
-\end{itemize}
-These two layers are then combined using 'stack'. This is rather similar to the \texttt{rhythmaskProbWith} function, but it does not depend on a list of probabilities. It takes a binary mask instead, where 1 is True and 0 is False.
+\texttt{rhythmaskWith} applies a transformation to the events that are masked out. It splits the pattern into two parts: Events that are kept when the mask is True and transformed when the mask is False. This is rather similar to the \texttt{rhythmaskProbWith} function, but it does not depend on a list of probabilities. It takes a binary mask instead, where 1 is True and 0 is False.
 
 \begin{code}
 rhythmaskWith :: Pattern a -> String -> (Pattern a -> Pattern a) -> Pattern a
