@@ -1,4 +1,4 @@
-\subsubsection{Tests}
+\subsubsection*{Tests}
 The test suite validates the behavior of RhythMask, testing the performance of not only the main event manipulation functions, but also the helper functions that are responsible for filtering events and generating masks (Boolean and probabilistic both). The tests are written using \texttt{hspec} and \texttt{QuickCheck}.
 
 \hide{

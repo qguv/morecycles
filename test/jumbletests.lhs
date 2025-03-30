@@ -1,4 +1,4 @@
-\subsubsection{Jumble tests}
+\subsubsection*{Jumble tests}
 
 \hide{
 \begin{code}

@@ -1,4 +1,4 @@
-\subsubsection{Tests}
+\subsubsection*{Tests}
 
 \hide{
 \begin{code}
