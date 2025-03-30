@@ -45,12 +45,12 @@ swing amt mp p = p {query = \st -> concatMap (applySwing mp st) (query p st)}
 
 To test swing manually, the following commands can be used:
 
-\begin{code}% haskell: ignore
-p2e $ swing 0.125 (s2p "[1 0 1 0]" :: Pattern Bool) (s2p "[a b c d]" :: Pattern String)
+\begin{code}
+-- p2e $ swing 0.125 (s2p "[1 0 1 0]" :: Pattern Bool) (s2p "[a b c d]" :: Pattern String)
 \end{code}
 
 When working with tidal, producing sounds:
 
-\begin{code}% haskell: ignore
-d1 $ swing' 0.125 ("1 0 1 0" :: Pattern Bool) (n "c a f e" # sound "supermandolin")
+\begin{code}
+-- d1 $ swing 0.125 ("1 0 1 0" :: Pattern Bool) (n "c a f e" # sound "supermandolin")
 \end{code}
