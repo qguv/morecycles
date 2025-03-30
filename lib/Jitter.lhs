@@ -1,4 +1,4 @@
-\subsection{Jitter}
+\subsection{Jitter (Debdutta)}
 In live-coded music, perfect quantization can sometimes sound mechanical and rigid. 
 Human musicians naturally introduce slight variations in timing, creating a sense of groove, 
 swing, or expressiveness. In genres like jazz, funk, and experimental electronic music, 

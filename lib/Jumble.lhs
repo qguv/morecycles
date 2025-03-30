@@ -1,4 +1,4 @@
-\subsection{Jumble}
+\subsection{Jumble (Quint)}
 
 In Western music,
 beats are often arranged hierarchically into a metrical structure.
