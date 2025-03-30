@@ -35,9 +35,9 @@ and the values at the other events are rotated.
 The smallest "empty space" becomes the granularity at which the unmasked events are chopped.
 
 \begin{code}
-jumble' :: Int -> Pattern Bool -> Pattern a -> Pattern a
-jumble' 0 _ p = p
-jumble' i mp p = stack [static, variable] where
+jumble :: Int -> Pattern Bool -> Pattern a -> Pattern a
+jumble 0 _ p = p
+jumble i mp p = stack [static, variable] where
   static = mask mp p
   variable = rotateValues $ mask (inv mp) p
 
