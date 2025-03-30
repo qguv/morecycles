@@ -101,8 +101,7 @@ testJitterPWithinBounds = describe "jitterP (constant max jitter pattern)" $ do
     differences `shouldSatisfy` all (<= maxJitterRational)
 \end{code}
 
-The main function runs the test suite.
-
+\hide{
 \begin{code}
 main :: IO ()
 main = hspec $ do
@@ -111,6 +110,7 @@ main = hspec $ do
   testJitterPNoJitter
   testJitterPWithinBounds
 \end{code}
+}
 
 The following test cases verify the correctness of the jitter functions:
 
