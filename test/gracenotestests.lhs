@@ -44,20 +44,37 @@ main :: IO ()
 main = hspec $ do
   describe "GraceNotes" $ do
 
-    -- it "shouldn't change the pattern when the mask is zero" $
-    --   property $ \a -> compareP a (gracenotes 0 (parseBP_E "[0]") (parseBP_E "[a b c d]")) (parseBP_E "[a b c d]" :: Pattern String)
+\end{code}
 
+The first test checks that the function doesn't change the pattern when the mask is all zeros.
+When the mask is all zeros, the function should return the original pattern since no grace notes are added.
+
+\begin{code}
 
     it "shouldn't change the pattern when the mask is all zeros" $
       property $ \a -> compareP a 
         (gracenotes' 0.125 (parseBP_E "[0 0 0 0]") (parseBP_E "[a b c d]")) 
         (parseBP_E "[a b c d]" :: Pattern String)
 
+\end{code}
+
+The second test checks that the function doesn't make a difference what the gracenote length is when the mask is all zeroes.
+When the mask is all zeroes, the function should return the original pattern since no grace notes are added.
+
+\begin{code}
     
     it "shouldn't make a difference what the gracenote length is when the mask is all zeroes" $
       property $ \a -> compareP a 
         (gracenotes' 0.25 (parseBP_E "[0 0 0 0]") (parseBP_E "[a b c d]" :: Pattern String)) 
         (gracenotes' 0.5 (parseBP_E "[0 0 0 0]") (parseBP_E "[a b c d]")) 
+
+\end{code}
+
+The third test checks that the function adds grace notes for all events when the mask is all ones..
+When the mask is all ones, the function should add grace notes for all events in the pattern.
+This test tests them for a length of 1/8.
+
+\begin{code}
 
     it "should add grace notes for all events when the mask is all ones and the length is 1/8" $
       property $ \a -> counterexample
@@ -67,6 +84,13 @@ main = hspec $ do
           (gracenotes' 0.125 (parseBP_E "[1 1 1 1]") (parseBP_E "[a b c d]"))
           correctPatternTest3)
 
+\end{code}
+
+The fourth test checks that the function adds grace notes for all events that overlap when the length is 1/4.
+This test tests them for a length of 1/4.
+
+\begin{code}
+
     it "should add grace notes for all events that overlap when the length is 1/4" $
       property $ \a -> counterexample
         ("Actual (floating-point):\n" ++ printPattern a (gracenotes' 0.25 (parseBP_E "[1 1 1 1]") (parseBP_E "[a b c d]") :: Pattern String) ++
@@ -74,6 +98,13 @@ main = hspec $ do
         (compareP a 
           (gracenotes' 0.25 (parseBP_E "[1 1 1 1]") (parseBP_E "[a b c d]"))
           correctPatternTest4)
+
+\end{code}
+
+The fifth test checks the functionality of the mask.
+It creates random masks and tests if the grace notes are added correctly.
+
+\begin{code}
 
     it "should selectively add grace notes if the mask is not uniformly ones" $
       property $ \a m -> 
