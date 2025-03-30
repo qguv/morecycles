@@ -1,3 +1,22 @@
 \section{About this project}
 
-TODO % TODO
+TidalCycles\footnote{\url{https://tidalcycles.org/}} is an environment for music livecoding:
+a type of musical performance where an audience watches an artist write code which generates sound.
+TidalCycles is based on Haskell and offers a ``mini-language'' for users to define cyclic patterns of ``events''.
+Events, in turn, are time spans where a particular value is active.
+In a musical context, these values can be the names of samples, notes, or chords;
+but as there are no additional constraints put on event values,
+they can also represent other parameters that vary over the course of the musical performance,
+such as the cutoff frequency of a filter,
+a boolean mask selecting certain notes and ignoring others,
+etc.
+
+In addition to the pattern mini-language,
+TidalCycles also provides a large library of functions which can modify patterns or apply digital signal processing (DSP) effects to the generated audio.
+In this project,
+each contributor was responsible for proposing, designing, implementing, and testing a pattern manipulation function:
+one which takes (at least) one pattern as input and produces a pattern as output.
+This structure allowed us to work more or less independently,
+exploring each of our musical interests,
+while still all learning how TidalCycles leverages the power of Haskell's inherant laziness
+to work with infinite patterns and constrained randomness.
