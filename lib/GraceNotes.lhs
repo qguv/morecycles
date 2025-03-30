@@ -96,7 +96,11 @@ gracenotes p = Pattern{query=newQuery} where
 
 To test this functionality manually, you can use the following commands;
 In the ghci terminal when purely working with patterns:
+\begin{code}% haskell: ignore
 p2e $ gracenotes' 0.125 (s2p "[1 0 1 0]" :: Pattern Bool) (s2p "[a b c d]" :: Pattern String)
 p2e $ gracenotes (s2p "[a b c d]" :: Pattern String)
+\end{code}
 When working with tidal, producing sounds:
+\begin{code}% haskell: ignore
 d1 $ gracenotes' 0.125 ("1 0 1 0" :: Pattern Bool) (n "c a f e" # sound "supermandolin")
+\end{code}
