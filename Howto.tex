@@ -1,5 +1,4 @@
-
-\section{How to use this?}
+\subsection{About this document}
 
 The source code of this project simultaneously defines
 a report as a \LaTeX{} document;
@@ -8,7 +7,7 @@ The latter can itself be used in two ways:
 as a Haskell library purely for pattern manipulation,
 or as a set of function definitions for the TidalCycles environment.
 
-\subsection{Compiling the report}
+\subsubsection*{Compiling the report}
 
 To generate the PDF: clone the repository, open \texttt{report.tex} in your favorite \LaTeX{} editor, and compile.
 You can also generate the report in a terminal by running
@@ -16,7 +15,7 @@ You can also generate the report in a terminal by running
 
 If you don't have a \LaTeX{} environment installed locally, you can also upload the \emph{entire} repository to a service like Overleaf, set the main file to \texttt{report.tex}, and compile it there.
 
-\subsection{Compiling and testing the library}
+\subsubsection*{Compiling and testing the library}
 
 You should have stack installed (see \url{https://haskellstack.org/}) and
 open a terminal in the same folder.
@@ -27,7 +26,7 @@ open a terminal in the same folder.
   \item To run the tests: \verb|stack clean && stack test --coverage|
 \end{itemize}
 
-\subsection{Using the functions in TidalCycles compositions}
+\subsubsection*{Using the functions in TidalCycles compositions}
 
 Getting the code to work in a live TidalCycles environment can be tricky.
 Doing it properly involves following the following steps, which are quite general because the particulars will depend on which platform you are using:
