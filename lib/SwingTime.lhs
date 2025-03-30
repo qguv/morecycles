@@ -1,4 +1,4 @@
-\subsection{swing_time}
+\subsection{SwingTime}
 In Western music, 
 particularly in jazz and blues, swing refers to a rhythmic feel where alternate beats are slightly delayed,
 creating a "long-short" pattern instead of an evenly spaced beat structure. This gives the rhythm a more dynamic, groovy feel.
