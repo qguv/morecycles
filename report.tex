@@ -18,7 +18,8 @@
 \maketitle
 
 \begin{abstract}
-    This paper describes the design and implementation of pattern manipulation (or generation) functions for TidalCycles that have musical value but aren't (yet) part of TidalCycles.
+    This paper describes the design and implementation of six new musically relevant pattern manipulation functions
+    for the music live-coding environment \emph{TidalCycles}.
 \end{abstract}
 
 \vfill
@@ -34,8 +35,22 @@
 \section{Functions}
 
 \input{lib/Jumble.lhs}
-
 \input{test/jumbletests.lhs}
+
+\input{lib/GraceNotes.lhs}
+% missing: gracenotes tests
+
+\input{lib/Jitter.lhs}
+\input{test/jittertests.lhs}
+
+\input{lib/PolyShift.lhs}
+\input{test/arrhythmiatests.lhs} % polyshift tests
+
+\input{lib/RhythMask.lhs}
+\input{test/rhythmasktests.lhs}
+
+\input{lib/SwingTime.lhs}
+% missing: swingtime tests
 
 \input{Conclusion.tex}
 

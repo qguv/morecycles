@@ -31,6 +31,17 @@ tests:
       - QuickCheck
       - hspec
       - tidal
+
+  jittertests:
+    main: jittertests.lhs
+    source-dirs: test
+    dependencies:
+      - morecycles
+      - QuickCheck
+      - hspec
+      - tidal
+      - random
+
   rhythmasktests:
     main: rhythmasktests.lhs
     source-dirs: test
