@@ -1,3 +1,5 @@
+\subsection{RhythmMask}
+
 \begin{code}
 {-# OPTIONS_GHC -Wno-name-shadowing #-}
 {-# OPTIONS_GHC -Wno-type-defaults #-}

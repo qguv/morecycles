@@ -135,7 +135,7 @@ jitterP pat maxJitterPat = Pattern $ \timespan ->
     in map updateEvent contentEvents
 \end{code}
 
-\subsection*{Implementation}
+\subsubsection*{Implementation}
 To test and see how \texttt{jitter} and \texttt{jitterP} work, one can follow these steps:
 
 \begin{itemize}
@@ -152,7 +152,11 @@ To test and see how \texttt{jitter} and \texttt{jitterP} work, one can follow th
 
   \item \textbf{Test the Variable Jitter Function:}  
         Apply the \texttt{jitterP} function to a pattern using a dynamic maximum jitter value derived from a pattern. For example:  
-        \verb|d1 $ jitterP (sound "bd sn cp hh") (range 0.01 0.05 sine)| \\
+        \verb|d1|
+        \verb|$ jitterP|
+        \verb|(sound "bd sn cp hh")|
+        \verb|(range 0.01 0.05 sine)|
+        \\
         Here, the maximum jitter value varies between 0.01 and 0.05 cycles following a sine wave, so the random shift applied to each event is determined by the 
         corresponding value in this pattern.
 
@@ -162,7 +166,7 @@ To test and see how \texttt{jitter} and \texttt{jitterP} work, one can follow th
 
 \end{itemize}
 
-\subsection*{Deterministic vs. Non-Deterministic Functions}
+\subsubsection*{Deterministic vs. Non-Deterministic Functions}
 
 A function is said to be \textbf{deterministic} if it always produces the same output given the same input. In other words, its behavior is completely predictable. 
 For example, a function that adds 0.1 to a value, such as

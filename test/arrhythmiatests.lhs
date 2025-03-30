@@ -1,7 +1,7 @@
-{-# OPTIONS_GHC -Wno-orphans #-}
 \subsubsection{Tests}
 
 \begin{code}
+{-# OPTIONS_GHC -Wno-orphans #-}
 module Main where
 
 import Jumble
@@ -42,4 +42,4 @@ main = hspec $ do
 
     it "" $
       property $ \a -> compareP a (jumble' 1 (parseBP_E "[0]") (parseBP_E "[a b]")) (parseBP_E "[b a]" :: Pattern String)
-\end {code}
+\end{code}
