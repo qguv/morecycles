@@ -37,9 +37,7 @@ swing' amt mp p = p {query = \st -> concatMap (applySwing mp st) (query p st)}
               isTrue _ = False
               swingShift = if shouldSwing then amt else 0
               newArc = Arc (startTime + swingShift) (endTime + swingShift)
-          in [ev {whole = Just newArc}]
-
-
+          in [ev {part = newArc, whole = Just newArc}]
 
 -- non-deterministic swing function that randomly selects a swing amount for each cycle
 -- it also randomizes the mask pattern

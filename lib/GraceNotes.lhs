@@ -70,6 +70,8 @@ gracenotes offset mp p = stack [original, graceNotes] where
                        nextValue = originalValues !! (eventIndex + 1)
                        -- Create the grace note
                        t0 = start $ part e
+                      --  graceStart = if t0 - offset < 0 then 1 + (t0 - offset) else t0 - offset
+                      --  graceEnd = graceStart + offset
                        graceStart = t0 - offset
                        graceEnd = t0
                        gracePart = Arc graceStart graceEnd
