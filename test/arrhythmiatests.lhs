@@ -15,10 +15,7 @@ import Sound.Tidal.ParseBP
 import Test.Hspec
 import Test.QuickCheck
 import Data.Ratio
-\end{code}
-}
 
-\begin{code}
 instance (Arbitrary a) => Arbitrary (Pattern a) where
   arbitrary = sized m where
     m nn | nn < 4 = listToPat . (:[]) <$> arbitrary
@@ -31,14 +28,13 @@ instance (Fractional a, Arbitrary a, Eq a) => Arbitrary (ArcF a) where
     m i = Arc 0 . notZero <$> x where
       x = resize (i `div` 2) arbitrary
       notZero nn = if nn == 0 then 1 else nn
-
 \end{code}
+}
 
 Here, we define two tests for arrhythmia. The first checks that shift the time by 0 returns the same
 pattern, and the second tests if the pattern eventually repeats the same cycle.
 
 \begin{code}
-
 main :: IO ()
 main = hspec $ do
   describe "Arrhythmia" $ do
@@ -56,5 +52,4 @@ main = hspec $ do
         where
           newArc :: Arc -> Time -> Arc
           newArc a nu = Arc (arcStart a * (denominator nu % 1)) ((arcStart a * (denominator nu % 1)) + (arcEnd a - arcStart a))
-
 \end{code}
