@@ -33,29 +33,23 @@ This, will wrap around to the next note in the pattern if the end of the pattern
 gracenotes' :: Time -> Pattern Bool -> Pattern a -> Pattern a
 gracenotes' offset mp p = stack [original, graceNotes] where
   original = p
-  -- Create grace notes for events that match the mask
   graceNotes = Pattern{query=newQuery}
   newQuery state =
     let 
       -- Get events that match the mask
       maskedEvents = query (mask mp p) state
-      
-      -- Get the pattern for a single cycle - this is our reference pattern
+      -- Get the pattern for a single cycle
       referenceState = State {arc = Arc 0 1, controls = controls state}
       referenceCycle = query p referenceState
-      
       -- Sort reference events by start time to establish sequence
       sortedReference = sortBy (\e1 e2 -> compare (cyclePos $ start $ part e1) (cyclePos $ start $ part e2)) referenceCycle
-      
       -- Create a circular list of values from the reference pattern
       referenceValues = cycle $ map value sortedReference
-      
       -- For each masked event, find its position in the cycle and get the next value
       createGraceNote e =
         let
           -- Get normalized position in cycle (0-1)
           cyclePosTime = cyclePos $ start $ part e
-          
           -- Find the closest event in the reference cycle
           findPosition [] _ = 0
           findPosition [_] _ = 0
@@ -63,12 +57,9 @@ gracenotes' offset mp p = stack [original, graceNotes] where
             if abs (cyclePos (start (part x)) - t) < 0.0001
             then 0  -- Found the event
             else 1 + findPosition xs t
-          
           eventIndex = findPosition sortedReference cyclePosTime
-          
           -- Get next value, respecting the cycle structure
           nextValue = referenceValues !! (eventIndex + 1)
-          
           -- Create the grace note
           t0 = start $ part e
           graceStart = t0 - offset
@@ -83,7 +74,6 @@ gracenotes' offset mp p = stack [original, graceNotes] where
 \end{code}
 For the non-deterministic version, we need to generate a random Boolean pattern.
 So we first define an instance of Arbitrary for Pattern.
-
 
 To test this functionality manually, you can use the following commands;
 In the ghci terminal when purely working with patterns:
