@@ -1,4 +1,4 @@
-\subsection{RhythmMask}
+\subsection{RhythmMask (Kaustav)}
 
 \begin{code}
 {-# OPTIONS_GHC -Wno-name-shadowing #-}

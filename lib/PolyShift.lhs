@@ -1,4 +1,4 @@
-\subsection{PolyShift}
+\subsection{PolyShift (Jay)}
 
 \begin{code}
 module PolyShift where
