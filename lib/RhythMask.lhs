@@ -134,7 +134,7 @@ rhythmaskWith pat maskStr transform =
   in stack [kept, transformed]
 \end{code}
 
-A sample input for this function for both cases can be defined as follows :
+A sample input:
 \begin{code}
 --d1 $ rhythmaskWith (sound "hh arpy bd sn") "1 0 1 0" (# gain 0.5)
 \end{code}
