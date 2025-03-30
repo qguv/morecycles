@@ -1,4 +1,4 @@
-\subsection{RhythmMask}
+\subsection{RhythmMask (Kaustav)}
 
 \textbf{"RhythMask": Probability-Based Masking}
 
