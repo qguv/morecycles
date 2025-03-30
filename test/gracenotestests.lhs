@@ -52,7 +52,7 @@ When the mask is all zeros, the function should return the original pattern sinc
 
     it "shouldn't change the pattern when the mask is all zeros" $
       property $ \a -> compareP a 
-        (gracenotes' 0.125 (parseBP_E "[0 0 0 0]") (parseBP_E "[a b c d]")) 
+        (gracenotes 0.125 (parseBP_E "[0 0 0 0]") (parseBP_E "[a b c d]")) 
         (parseBP_E "[a b c d]" :: Pattern String)
 
 \end{code}
@@ -64,8 +64,8 @@ When the mask is all zeroes, the function should return the original pattern sin
     
     it "shouldn't make a difference what the gracenote length is when the mask is all zeroes" $
       property $ \a -> compareP a 
-        (gracenotes' 0.25 (parseBP_E "[0 0 0 0]") (parseBP_E "[a b c d]" :: Pattern String)) 
-        (gracenotes' 0.5 (parseBP_E "[0 0 0 0]") (parseBP_E "[a b c d]")) 
+        (gracenotes 0.25 (parseBP_E "[0 0 0 0]") (parseBP_E "[a b c d]" :: Pattern String)) 
+        (gracenotes 0.5 (parseBP_E "[0 0 0 0]") (parseBP_E "[a b c d]")) 
 
 \end{code}
 
@@ -77,10 +77,10 @@ This test tests them for a length of 1/8.
 
     it "should add grace notes for all events when the mask is all ones and the length is 1/8" $
       property $ \a -> counterexample
-        ("Actual (floating-point):\n" ++ printPattern a (gracenotes' 0.125 (parseBP_E "[1 1 1 1]") (parseBP_E "[a b c d]") :: Pattern String) ++
+        ("Actual (floating-point):\n" ++ printPattern a (gracenotes 0.125 (parseBP_E "[1 1 1 1]") (parseBP_E "[a b c d]") :: Pattern String) ++
         "\nExpected (floating-point):\n" ++ printPattern a correctPatternTest3)
         (compareP a 
-          (gracenotes' 0.125 (parseBP_E "[1 1 1 1]") (parseBP_E "[a b c d]"))
+          (gracenotes 0.125 (parseBP_E "[1 1 1 1]") (parseBP_E "[a b c d]"))
           correctPatternTest3)
 
 \end{code}
@@ -92,10 +92,10 @@ This test tests them for a length of 1/4.
 
     it "should add grace notes for all events that overlap when the length is 1/4" $
       property $ \a -> counterexample
-        ("Actual (floating-point):\n" ++ printPattern a (gracenotes' 0.25 (parseBP_E "[1 1 1 1]") (parseBP_E "[a b c d]") :: Pattern String) ++
+        ("Actual (floating-point):\n" ++ printPattern a (gracenotes 0.25 (parseBP_E "[1 1 1 1]") (parseBP_E "[a b c d]") :: Pattern String) ++
         "\nExpected (floating-point):\n" ++ printPattern a correctPatternTest4)
         (compareP a 
-          (gracenotes' 0.25 (parseBP_E "[1 1 1 1]") (parseBP_E "[a b c d]"))
+          (gracenotes 0.25 (parseBP_E "[1 1 1 1]") (parseBP_E "[a b c d]"))
           correctPatternTest4)
 
 \end{code}
@@ -111,10 +111,10 @@ It creates random masks and tests if the grace notes are added correctly.
         mask = take 4 (m ++ repeat False) :: [Bool]
         maskPattern = listToPat mask :: Pattern Bool
       in counterexample
-        ("Actual (floating-point):\n" ++ printPattern a (gracenotes' 0.25 (parseBP_E "[1 1 1 1]") (parseBP_E "[a b c d]") :: Pattern String) ++
+        ("Actual (floating-point):\n" ++ printPattern a (gracenotes 0.25 (parseBP_E "[1 1 1 1]") (parseBP_E "[a b c d]") :: Pattern String) ++
         "\nExpected (floating-point):\n" ++ printPattern a (correctPatternTest5 mask))
         (compareP a 
-          (gracenotes' 0.125 maskPattern (parseBP_E "[a b c d]"))
+          (gracenotes 0.125 maskPattern (parseBP_E "[a b c d]"))
           (correctPatternTest5 mask))
 
 \end{code}
