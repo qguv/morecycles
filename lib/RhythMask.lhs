@@ -1,37 +1,35 @@
-\subsection{RhythmMask (Kaustav)}
+\subsection{RhythmMask}
+
+\textbf{"RhythMask": Probability-Based Masking}
+
+The idea behind RhythMask is to create a rhythmic effect where some beats are probabilistically dropped or kept each cycle, rather than being strictly fixed by a binary mask.
+
+\textbf{Theoretical implementation idea}
+
+\textbf{Input:}
+\begin{itemize}
+    \item A content pattern (Pattern a): The original rhythmic sequence.
+    \item A probability pattern (Pattern Double): A probability value (between 0.0 and 1.0) that determines the likelihood of each beat being played.
+\end{itemize}
+
+\textbf{Output:} A modified version of the input pattern with beats dropped probabilistically.
+
+\textbf{Steps of implementation:}
+\begin{itemize}
+    \item Extract Events: The function first queries the input pattern to get a list of its events.
+    \item Apply Probability Filtering: Each event is evaluated against the corresponding probability value.
+    \item Random Decision Making: A random number is generated for each event, and if it is below the probability threshold, the event passes on to the final output, otherwise it is removed.
+    \item Reconstruction of the Pattern: The remaining beats are reconstructed into a new TidalCycles pattern.
+\end{itemize}
+
+The main function that handles this is \texttt{rhythmaskProb}. It applies a probabilistic mask to a series of events (musical notes) that is passed as a string to Tidal. A probabilistic mask is a list of values like [0.0, 0.29, 0.17, 1.0], which defines a list of probabilities (the highest value is 1 and the lowest is 0). Each element in this list corresponds to a single event from a string that is passed to the function such as: "bd sn arpy hh". If the value is 1, then the beat (event) is always kept, if it 0, then it is always dropped, and if it is between 0 and 1, then based on the number (the probabilistic value), the beat may or may not be kept in each cycle. This introduces a little anarchy into the infinite musical loop in Tidal, wherein a beat that is played in the first cycle may not be played in the second one, but may be played again in another subsequent cycle.
+
+The steps and the function described above define one of the main functionalities of the RhythMask function. However, this is relatively easy to do in Tidal using \texttt{fastcat} and \texttt{fmap}. So, in order to expand on this, I added addtional features to the code that makes sense, while staying true to the core idea of RhythMask. These functions are \texttt{rhythmaskProbWith}, \texttt{rhythmask} and \texttt{rhythmaskWith}.
 
 \begin{code}
 {-# OPTIONS_GHC -Wno-name-shadowing #-}
 {-# OPTIONS_GHC -Wno-type-defaults #-}
 \end{code}
-
-"RhythMask": Probability-Based Masking
-The idea behind RhythMask is to create a rhythmic effect where some beats are 
-probabilistically dropped or kept each cycle, 
-rather than being strictly fixed by a binary mask.
-
-Theoretical implementation idea
-Input:
--> A content pattern (Pattern a): The original rhythmic sequence.
--> A probability pattern (Pattern Double): A probability value (between 0.0 and 1.0) 
-that determines the likelihood of each beat being played.
-
-Output: A modified version of the input pattern with beats dropped probabilistically
-
-Steps of implementation:
-->Extract Events: The function first queries the input pattern to get a list of its events.
-->Apply Probability Filtering: Each event is evaluated against the corresponding probability value.
-->Random Decision Making: A random number is generated for each event, and if it is below the 
-probability threshold, the event passes on to the final output, otherwise it is removed.
-->Reconstruction of the Pattern: The remaining beats are reconstructed into a new TidalCycles pattern.
-
-Additional Functionality:
--> Instead of passing a set of probability values, I am passing a binary mask (e.g. [1 0 1 0]),
-where 1 is True and 0 is False. This determines which beats will be kept in a sequence and which
-ones will be dropped. However, there is a helper function at the beginning, that generates a random
-mask.
-
-
 
 \begin{code}
 
@@ -48,15 +46,28 @@ module RhythMask (
 
 import Sound.Tidal.Context
 
+\end{code}
+
+The probabilistic mask is defined by the function \texttt{probMaskPattern}. The \texttt{fmap} here applies the function (< p) to each random value in rand, resulting in True with probability p (since a random number between 0 and 1 is < p with probability p). The \texttt{fastcat} method takes a list [Pattern a] and returns Pattern a. It takes a list of patterns and concatenates them in time, cycling through them faster than \texttt{cat}. It divides one cycle equally among the patterns, so if you pass 4 patterns, each one gets 1/4 of a cycle.
+
+\begin{code}
 -- | Probabilistic mask: generates a Pattern Bool from a list of Doubles (0.0 to 1.0)
 probMaskPattern :: [Double] -> Pattern Bool
 probMaskPattern probs =
   fastcat $ map (\p -> fmap (< p) (rand :: Pattern Double)) probs
+\end{code}
 
+The \texttt{rhythmaskProb} is the main function that takes a probabilistic mask and applies it to a sequence of events in Tidal.
+
+\begin{code}
 -- | Applies a probabilistic mask to a pattern
 rhythmaskProb :: Pattern a -> [Double] -> Pattern a
 rhythmaskProb pat probs = myFilterEvents pat (probMaskPattern probs)
+\end{code}
 
+\texttt{rhythmaskProbWith} uses a probabilistic mask generated by the function \texttt{probMaskPattern} to apply a transformation to an event instead of dropping it. If the value in the probabilistic mask is 1, then the specified transformation is always applied, if it 0, then it is never applied, and if it is between 0 and 1, then based on the number (the probabilistic value), a transformation may or may not be applied in each cycle of the infinite music loop playing in Tidal.
+
+\begin{code}
 -- | Applies a transformation to masked-out events using a probabilistic mask
 rhythmaskProbWith :: Pattern a -> [Double] -> (Pattern a -> Pattern a) -> Pattern a
 rhythmaskProbWith pat probs transform =
@@ -65,53 +76,51 @@ rhythmaskProbWith pat probs transform =
       kept         = myFilterEvents pat maskP
       transformed  = myFilterEvents (transform pat) notMaskP
   in stack [kept, transformed]
+\end{code}
 
+\begin{code}
 -- | generates a random set of True/False (0/1) values to drop or keep beats.
-{-|
-Note that this function is not purely random. I tried to avoid using non-native Tidal
-imports as much as possible to ensure that the music generation happens smoothly,
-since Tidal files are unable to read import statements.
--}
 randomMaskString :: Int -> String
 randomMaskString n = unwords $ take n $ map (\x -> if even (x * 37 `mod` 7) then "1" else "0") [1..]
+\end{code}
 
-{-|
-  parseMask converts a binary mask string (e.g. "1 0 1 0") into a Pattern Bool.
-  It splits the string into words, maps "1" to True and any other word to False,
-  cycles the resulting list, and then limits it to one cycle using take.
--}
+\texttt{parseMask} converts a binary mask string (e.g. "1 0 1 0") into a Pattern Bool. It splits the string into words, maps "1" to True and any other word to False, cycles the resulting list, and then limits it to one cycle using take.
+
+\begin{code}
 parseMask :: String -> Pattern Bool
 parseMask s =
   let bits = map (== "1") (words s)
   in fastcat (map pure bits)
-{-|
-  myFilterEvents takes a pattern 'pat' and a boolean mask pattern 'maskPat'
-  and produces a new pattern that only keeps events where the mask is True.
-  (It extracts the events from both patterns at a given time, zips them, and
-  keeps an event if its corresponding mask event (extracted via value) is True.)
--}
+\end{code}
+
+\texttt{myFilterEvents} takes a pattern 'pat' and a boolean mask pattern 'maskPat' and produces a new pattern that only keeps events where the mask is True. (It extracts the events from both patterns at a given time, zips them, and keeps an event if its corresponding mask event (extracted via value) is True.)
+
+\begin{code}
 myFilterEvents :: Pattern a -> Pattern Bool -> Pattern a
 myFilterEvents pat maskPat = Pattern $ \s ->
   let es = query pat s
       bs = query maskPat s
       filtered = [ e | (e, b) <- zip es bs, value b ]
   in filtered
+\end{code}
 
-{-|
-  rhythmask applies a mask (given as a string like "1 0 1 0") to a pattern.
-  Only events corresponding to a True (or "1") in the mask will be kept.
--}
+\texttt{rhythmask} applies a mask (given as a string like "1 0 1 0") to a pattern. Only events corresponding to a True (or "1") in the mask will be kept.
+
+\begin{code}
 rhythmask :: Pattern a -> String -> Pattern a
 rhythmask pat maskStr = myFilterEvents pat (parseMask maskStr)
+\end{code}
 
-{-|
-  rhythmaskWith applies a transformation to the events that are masked out.
-  It splits the pattern into two parts:
-    1. 'kept' events where the mask is True,
-    2. 'transformed' events (obtained by applying the given transformation)
-       where the mask is False.
-  These two layers are then combined using 'stack'.
--}
+\texttt{rhythmaskWith} applies a transformation to the events that are masked out.
+It splits the pattern into two parts:
+\begin{itemize}
+    \item 'kept' events where the mask is True,
+    \item 'transformed' events (obtained by applying the given transformation)
+   where the mask is False.
+\end{itemize}
+These two layers are then combined using 'stack'.
+
+\begin{code}
 rhythmaskWith :: Pattern a -> String -> (Pattern a -> Pattern a) -> Pattern a
 rhythmaskWith pat maskStr transform =
   let maskP    = parseMask maskStr
