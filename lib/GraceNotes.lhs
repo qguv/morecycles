@@ -20,10 +20,18 @@ import Sound.Tidal.UI
 import Sound.Tidal.Core
 import Data.List
 
--- | gracenotes adds grace notes before events that match the mask pattern
--- The Double parameter specifies how early the grace note starts
-gracenotes' :: Double -> Pattern Bool -> Pattern a -> Pattern a
-gracenotes' startTime mp p = stack [original, graceNotes] where
+
+\end{code}
+the function gracenotes takes as input a Time variable, a Pattern Bool, and an original Pattern. The output is the resulting pattern with grace notes added.
+The grace notes are added to the notes that match the mask pattern.
+The Double parameter specifies how early the grace note starts, relative to the main note.
+So a grace note with offset 0.125 starts 1/8th of a cycle before the main note, and ends when the main note starts.
+The pitch of the grace note is always the same as the next note in the original pattern.
+This, will wrap around to the next note in the pattern if the end of the pattern is reached.
+\begin{code}
+
+gracenotes' :: Time -> Pattern Bool -> Pattern a -> Pattern a
+gracenotes' offset mp p = stack [original, graceNotes] where
   original = p
   -- Get all events from the original pattern for a given state
   getOriginalEvents state = query p state
@@ -62,11 +70,12 @@ gracenotes' startTime mp p = stack [original, graceNotes] where
                        nextValue = originalValues !! (eventIndex + 1)
                        -- Create the grace note
                        t0 = start $ part e
-                       offsetTime = realToFrac startTime :: Time
-                       graceStart = max 0 (t0 - offsetTime)
+                      --  graceStart = if t0 - offset < 0 then 1 + (t0 - offset) else t0 - offset
+                      --  graceEnd = graceStart + offset
+                       graceStart = t0 - offset
                        graceEnd = t0
                        gracePart = Arc graceStart graceEnd
-                       graceEvent = e {part = gracePart, value = nextValue}
+                       graceEvent = e {part = gracePart, whole=Just gracePart, value = nextValue}
                      in graceEvent
                  in map createGraceNotes maskedEvents
     in result
@@ -85,8 +94,9 @@ gracenotes p = Pattern{query=newQuery} where
 
 \end{code}
 
-Test in ghci:
+To test this functionality manually, you can use the following commands;
+In the ghci terminal when purely working with patterns:
 p2e $ gracenotes' 0.125 (s2p "[1 0 1 0]" :: Pattern Bool) (s2p "[a b c d]" :: Pattern String)
 p2e $ gracenotes (s2p "[a b c d]" :: Pattern String)
-Test in tidal:
+When working with tidal, producing sounds:
 d1 $ gracenotes' 0.125 ("1 0 1 0" :: Pattern Bool) (n "c a f e" # sound "supermandolin")
