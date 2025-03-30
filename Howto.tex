@@ -1,15 +1,52 @@
 
 \section{How to use this?}
 
-To generate the PDF, open \texttt{report.tex} in your favorite \LaTeX editor and compile.
-Alternatively, you can manually do
-\texttt{pdflatex report; bibtex report; pdflatex report; pdflatex report} in a terminal.
+The source code of this project simultaneously defines
+a report as a \LaTeX document;
+as well as a Haskell library with an included test suite.
+The latter can itself be used in two ways:
+as a Haskell library purely for pattern manipulation,
+or as a set of function definitions for the TidalCycles environment.
+
+\subsection{Compiling the report}
+
+To generate the PDF: clone the repository, open \texttt{report.tex} in your favorite \LaTeX editor, and compile.
+You can also generate the report in a terminal by running
+\texttt{pdflatex report; bibtex report; pdflatex report; pdflatex report}
+
+If you don't have a \LaTeX environment installed locally, you can also upload the \emph{entire} repository to a service like Overleaf, set the main file to \texttt{report.tex}, and compile it there.
+
+\subsection{Compiling and testing the library}
 
 You should have stack installed (see \url{https://haskellstack.org/}) and
 open a terminal in the same folder.
 
 \begin{itemize}
   \item To compile everything: \verb|stack build|.
-  \item To open ghci and play with your code: \verb|stack ghci|
+  \item To open ghci and play with the code: \verb|stack ghci|
   \item To run the tests: \verb|stack clean && stack test --coverage|
+\end{itemize}
+
+\subsection{Using the functions in TidalCycles compositions}
+
+Getting the code to work in a live TidalCycles environment can be tricky.
+Doing it properly involves following the following steps, which are quite general because the particulars will depend on which platform you are using:
+
+\begin{itemize}
+  \item Create a new stack project that pulls in both this library and TidalCycles as dependencies
+  \item Install SuperCollider and SuperDirt locally
+  \item Follow the rest of the installation instructions on the TidalCycles website, but use the local stack project instead of installing the package globally
+  \item Create a \verb|BootTidal.hs| file somewhere which imports the \verb|morecycles| functions you want to use and binds them to the appropriate names
+  \item Configure you reditor to read the \verb|BootTidal.hs| file
+\end{itemize}
+
+However, experience in our group has shown that this can be a time-consuming and error-prone process on some platforms (particularly: the commercial operating systems).
+If the above steps are not working or take too long, we offer the following as a quick-and-dirty alternative:
+
+\begin{itemize}
+  \item Install TidalCycles, SuperCollider, and SuperDirt exactly as described on the TidalCycles website
+  \item Select the Haskell source of the function(s) you want to use
+  \item Remove all newlines and comments
+  \item Paste these into the editor you configured for TidalCycles in the first step
+  \item Use the keyboard shortcut you typically use for executing a line, to execute this code, adding the name binding to the current interpreter session
 \end{itemize}
