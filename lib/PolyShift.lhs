@@ -1,9 +1,7 @@
 \begin{code}
 module PolyShift where
 
-\end{code}
-
-- plays a pattern only on the kth cycle
+-- plays a pattern only on the kth cycle
 
 playOnly n k p = every' n k (<> p) "~" 
 
@@ -21,3 +19,4 @@ helper j k l m n p
 
 polyShift n p = helper (denominator n) (denominator n) 0 0 n p
 
+\end{code}
