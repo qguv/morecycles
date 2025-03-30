@@ -30,8 +30,8 @@ The pitch of the grace note is always the same as the next note in the original 
 This, will wrap around to the next note in the pattern if the end of the pattern is reached.
 \begin{code}
 
-gracenotes :: Time -> Pattern Bool -> Pattern a -> Pattern a
-gracenotes offset mp p = stack [original, graceNotes] where
+gracenotes' :: Time -> Pattern Bool -> Pattern a -> Pattern a
+gracenotes' offset mp p = stack [original, graceNotes] where
   original = p
   -- Get all events from the original pattern for a given state
   getOriginalEvents state = query p state
