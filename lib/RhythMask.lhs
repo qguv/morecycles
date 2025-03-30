@@ -67,6 +67,11 @@ rhythmaskProbWith pat probs transform =
   in stack [kept, transformed]
 
 -- | generates a random set of True/False (0/1) values to drop or keep beats.
+{-|
+Note that this function is not purely random. I tried to avoid using non-native Tidal
+imports as much as possible to ensure that the music generation happens smoothly,
+since Tidal files are unable to read import statements.
+-}
 randomMaskString :: Int -> String
 randomMaskString n = unwords $ take n $ map (\x -> if even (x * 37 `mod` 7) then "1" else "0") [1..]
 
