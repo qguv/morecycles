@@ -1,5 +1,4 @@
-\documentclass{article}
-\begin{document}
+\subsection{Rhythmask tests}
 
 This is the test suite for the \texttt{Rhythmask} module.  
 It uses \texttt{hspec} to test the following functions:

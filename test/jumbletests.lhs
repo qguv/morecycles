@@ -1,4 +1,4 @@
-\subsubsection{Tests}
+\subsubsection{Jumble tests}
 
 \begin{code}
 {-# OPTIONS_GHC -Wno-orphans #-}

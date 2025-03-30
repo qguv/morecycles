@@ -11,8 +11,8 @@ import Sound.Tidal.ParseBP
 import SwingTime
 import Jumble
 import GraceNotes
-import Polyshift
-import jitter
+import PolyShift
+import Jitter
 import RhythMask
 
 {-
