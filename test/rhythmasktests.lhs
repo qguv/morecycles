@@ -15,6 +15,8 @@ It uses \texttt{hspec} to test the following functions:
 
 \begin{code}
 {-# LANGUAGE OverloadedStrings #-}
+{-# OPTIONS_GHC -Wno-type-defaults #-}
+{-# OPTIONS_GHC -Wno-name-shadowing #-}
 module Main where
 
 import Test.Hspec
@@ -72,7 +74,7 @@ testRhythmaskWith = describe "rhythmaskWith" $ do
     -- With mask "1 0 1 0":
     --   Kept events: events (positions) 1 and 3 ("a" and "c")
     --   Transformed events: events (positions) 2 and 4 ("b!" and "d!")
-    let transform = fmap (\x -> x ++ "!")
+    let transform = fmap (++ "!")
         result    = rhythmaskWith testPattern "1 0 1 0" transform
         events    = take 4 (query result (stateFor 4))
         values    = map value events
@@ -113,7 +115,7 @@ testRhythmaskProbWith = describe "rhythmaskProbWith" $ do
     --   Kept events: events (positions) 1 and 3 ("a" and "c")
     --   Transformed event: event (position) 2 ("b!")
     let pat       = fromList ["a", "b", "c"]
-        transform = fmap (\x -> x ++ "!")
+        transform = fmap (++ "!")
         result    = rhythmaskProbWith pat [1.0, 0.0, 1.0] transform
         events    = take 3 (query result (stateFor 3))
         values    = map value events
