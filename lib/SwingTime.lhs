@@ -65,9 +65,15 @@ randomswing p = p {query = \st -> concatMap (applyRandomSwing st) (query p st)}
 
 \end{code}
 
-
 Test in ghci:
+
+\begin{code}% haskell: ignore
 p2e $ swing' 0.125 (s2p "[1 0 1 0]" :: Pattern Bool) (s2p "[a b c d]" :: Pattern String)
 p2e $ randomswing (s2p "[a b c d]" :: Pattern String)
+\end{code}
+
 Test in tidal:
+
+\begin{code}% haskell: ignore
 d1 $ swing' 0.125 ("1 0 1 0" :: Pattern Bool) (n "c a f e" # sound "supermandolin")
+\end{code}
