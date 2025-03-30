@@ -1,10 +1,7 @@
 \subsection{Jitter (Debdutta)}
 In live-coded music, perfect quantization can sometimes sound mechanical and rigid. 
 Human musicians naturally introduce slight variations in timing, creating a sense of groove, 
-swing, or expressiveness. In genres like jazz, funk, and experimental electronic music, 
-these subtle shifts are an essential part of musical feel.  
-
-It would be useful if musicians could introduce controlled randomness into their patterns, 
+swing, or expressiveness. It would be useful if musicians could introduce controlled randomness into their patterns, 
 allowing each event to slightly vary in timing while still maintaining the overall rhythmic structure. 
 This function, which we call \texttt{jitter}, enables such organic fluctuations by introducing small, 
 randomized shifts to event start times.
@@ -59,7 +56,7 @@ to that value, and then adds the resulting offset to the event's start time. Thi
 enabling effects like swing, groove, or subtle rhythmic fluctuations—all while preserving the overall structure of the pattern.
 
 Example: 
-\texttt{d1 \$ jitterWith (*0.05) (sound "bd sn cp hh")}
+\texttt{d1 \$ jitterWith (*0.05) (sound "bd sn cp hh").}
 In this example, each event's start time is shifted by an amount that is 0.05 times a random value, adding a controlled, random variation to the rhythm.
 
 
@@ -141,7 +138,7 @@ To test and see how \texttt{jitter} and \texttt{jitterP} work, one can follow th
 \begin{itemize}
 
   \item \textbf{Load the Module:}  
-        In your TidalCycles session, ensure that your module is in the search path and load it by running:  
+        In your TidalCycles session, ensure that your module is in the search path and load it by running: 
         \verb|:set -i"/morecycles/lib"| \\
         \verb|:m + Jitter|
         
@@ -169,15 +166,9 @@ To test and see how \texttt{jitter} and \texttt{jitterP} work, one can follow th
 \subsubsection*{Deterministic vs. Non-Deterministic Functions}
 
 A function is said to be \textbf{deterministic} if it always produces the same output given the same input. In other words, its behavior is completely predictable. 
-For example, a function that adds 0.1 to a value, such as
-\[
-f(x) = x + 0.1,
-\]
-is deterministic because \(f(1) = 1.1\) every time it is called.
 
 A \textbf{non-deterministic} function, on the other hand, may produce different outputs for the same input. This typically happens when the function involves 
-randomness, external state, or time-dependent behavior. For example, a function that returns a random number between \(-0.02\) and \(0.02\) will produce 
-different results on each call, even when provided with the same input.
+randomness, external state, or time-dependent behavior.
 
 In our implementation, the behavior of the functions falls into two categories:
 
@@ -215,7 +206,7 @@ In our implementation, the behavior of the functions falls into two categories:
       \end{verbatim}
       yields event timings that change from cycle to cycle in a non-predictable manner.
     \end{itemize}
-
+    \hide{
     \textbf{Summary Examples:}
     \begin{enumerate}
       \item With \texttt{myModifyTime}, if the transformation is \texttt{(+0.1)}, every event is delayed by exactly 0.1 cycles:
@@ -233,7 +224,7 @@ In our implementation, the behavior of the functions falls into two categories:
       \]
       Here, the maximum jitter value changes according to a sine wave, and the random offset applied is within the current bound. Although 
       the \texttt{range} pattern is deterministic, the resulting event shifts are non-deterministic due to the randomness in offset selection.
-    \end{enumerate}
+    \end{enumerate}}
 \end{itemize}
 
 In conclusion, while \texttt{myModifyTime} deterministically applies a specified transformation to event timings, the higher-level 
