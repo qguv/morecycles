@@ -1,7 +1,7 @@
-{-# OPTIONS_GHC -Wno-orphans #-}
 \subsubsection{Tests}
 
 \begin{code}
+{-# OPTIONS_GHC -Wno-orphans #-}
 module Main where
 
 import Jumble
