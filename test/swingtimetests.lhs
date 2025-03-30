@@ -59,7 +59,7 @@ The second test checks that the function doesn't make a difference what the swin
 
 \begin{code}
 
-    it "shouldn't make a difference what the gracenote length is when the mask is all zeroes" $
+    it "shouldn't make a difference what the swing amount is when the mask is all zeroes" $
       property $ \a -> compareP a 
         (swingtime 0.125 (parseBP_E "[0 0 0 0]") (parseBP_E "[a b c d]" :: Pattern String)) 
         (swingtime 0.25 (parseBP_E "[0 0 0 0]") (parseBP_E "[a b c d]" :: Pattern String))
@@ -110,10 +110,10 @@ This is done by comparing the result of the function with the result of a strict
               createNote (0.625 + fromIntegral c, 0.875 + fromIntegral c, "c")
             ]
           
-          -- Generate grace notes for all cycles in the query range
+          -- Generate swing notes for all cycles in the query range
           allSwungNotes = concatMap swungNotesForCycle [startCycle..endCycle]
           
-          -- Filter grace notes to only include those in the query range
+          -- Filter swing notes to only include those in the query range
           relevantSwungNotes = filter (\e -> 
             start (part e) <= arcEnd && stop (part e) >= arcStart) allSwungNotes
         in
