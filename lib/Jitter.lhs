@@ -1,10 +1,7 @@
 \subsection{Jitter (Debdutta)}
 In live-coded music, perfect quantization can sometimes sound mechanical and rigid. 
 Human musicians naturally introduce slight variations in timing, creating a sense of groove, 
-swing, or expressiveness. In genres like jazz, funk, and experimental electronic music, 
-these subtle shifts are an essential part of musical feel.  
-
-It would be useful if musicians could introduce controlled randomness into their patterns, 
+swing, or expressiveness. It would be useful if musicians could introduce controlled randomness into their patterns, 
 allowing each event to slightly vary in timing while still maintaining the overall rhythmic structure. 
 This function, which we call \texttt{jitter}, enables such organic fluctuations by introducing small, 
 randomized shifts to event start times.
@@ -20,20 +17,12 @@ import System.IO.Unsafe (unsafePerformIO) -- Import unsafePerformIO to extract a
 \end{code}
 }
 
-The function \texttt{myModifyTime} enables precise timing modifications by applying a transformation function to the start 
-time of each event in a pattern. It works by querying all events within a given time span and then updating each event's timing arc. 
-Specifically, it:
+The function \texttt{myModifyTime} precisely modifies event timing by applying a transformation function to each event’s start time. 
+It queries all events within a time span, retrieves their start time, converts it to a Double for the transformation, applies the function, 
+converts the modified time back to Rational, and updates the event’s arc while preserving the original stop time.
 
-\begin{itemize}
-    \item Retrieves the event's start time (stored as a Rational) from its timing arc.
-    \item Converts the start time to a Double so that the transformation function can operate on it.
-    \item Applies the provided function to compute a new start time.
-    \item Converts the modified time back to Rational and updates the event's arc—while preserving the original stop time.
-\end{itemize}
-
-This mechanism allows for controlled alterations in rhythmic feel, making patterns more flexible and human-like. 
-It serves as a core building block for higher-level functions, such as jitter effects, which introduce randomness or 
-other time-based modifications into a performance.
+This mechanism allows controlled alterations in rhythmic feel, making patterns more flexible and human-like. It forms the basis 
+for higher-level functions like jitter effects, which introduce randomness or other time-based modifications into a performance.
 
 \begin{code}
 
@@ -53,15 +42,14 @@ myModifyTime pat f = Pattern $ \timeSpan ->
 
 \end{code}
 
-The function \texttt{jitterWith} introduces controlled timing variations by applying an offset function to the start time of 
-each event in a pattern. It works by simultaneously querying two patterns: the input pattern and a continuously generated random pattern, 
-using the built-in \texttt{rand} function. For each event, it takes a random value from the \texttt{rand} pattern, applies the provided offset function 
-to that value, and then adds the resulting offset to the event's start time. This process creates systematic deviations from strict timing, 
-enabling effects like swing, groove, or subtle rhythmic fluctuations—all while preserving the overall structure of the pattern.
+The \texttt{jitterWith} function introduces controlled timing variations by applying an offset function to the start time 
+of each event in a pattern. It simultaneously queries the input pattern and a continuously generated random pattern using the 
+built-in \texttt{rand} function. For each event, it takes a random value from the random pattern, applies the offset function, 
+and adds the result to the event’s start time. This process creates systematic deviations from strict timing, enabling effects like 
+swing, groove, or subtle rhythmic fluctuations while preserving the overall pattern structure.
 
-Example: 
-\texttt{d1 \$ jitterWith (*0.05) (sound "bd sn cp hh")}
-In this example, each event's start time is shifted by an amount that is 0.05 times a random value, adding a controlled, random variation to the rhythm.
+Example: \texttt{d1 \$ jitterWith (*0.05) (sound “bd sn cp hh”).} This example shifts each event’s start time by 0.05 times a random value, 
+adding controlled, random variation to the rhythm.
 
 
 \begin{code}
@@ -102,13 +90,11 @@ jitter pat maxJitter
 \end{code}
 
 
-The function \texttt{jitterP} introduces random timing variations to a pattern, but with a twist: 
-the maximum jitter applied to each event is determined dynamically by a separate pattern (\texttt{maxJitterPat}). 
-For each event in the input pattern, \texttt{jitterP} identifies the corresponding event 
-in \texttt{maxJitterPat}—based on overlapping time cycles—and uses its value as the upper bound for a random offset. 
-A random value is then generated uniformly in the range \([-m, m]\), where \(m\) is the extracted jitter value, and 
-this offset is added to the event’s start time. As a result, the rhythm is varied in a dynamic and expressive way, 
-enabling more nuanced and human-like timing fluctuations while preserving the overall structure of the pattern.
+The function \texttt{jitterP} introduces random timing variations to a pattern. It dynamically determines the maximum jitter applied 
+to each event based on a separate pattern (\texttt{maxJitterPat}). For each event, it identifies the corresponding event in \texttt{maxJitterPat} 
+based on overlapping time cycles and uses its value as the upper bound for a random offset. A random value is generated uniformly in the 
+range \([-m, m]\), where \(m\) is the extracted jitter value, and added to the event’s start time. This dynamic variation creates nuanced and 
+human-like timing fluctuations while preserving the overall pattern structure.
 
 \begin{code}
 jitterP :: Pattern a -> Pattern Double -> Pattern a
@@ -142,7 +128,7 @@ To test and see how \texttt{jitter} and \texttt{jitterP} work, one can follow th
 \begin{itemize}
 
   \item \textbf{Load the Module:}  
-        In your TidalCycles session, ensure that your module is in the search path and load it by running:  
+        In your TidalCycles session, ensure that your module is in the search path and load it by running: 
         \verb|:set -i"/morecycles/lib"| \\
         \verb|:m + Jitter|
         
@@ -169,16 +155,8 @@ To test and see how \texttt{jitter} and \texttt{jitterP} work, one can follow th
 
 \subsubsection*{Deterministic vs. Non-Deterministic Functions}
 
-A function is said to be \textbf{deterministic} if it always produces the same output given the same input. In other words, its behavior is completely predictable. 
-For example, a function that adds 0.1 to a value, such as
-\[
-f(x) = x + 0.1,
-\]
-is deterministic because \(f(1) = 1.1\) every time it is called.
-
-A \textbf{non-deterministic} function, on the other hand, may produce different outputs for the same input. This typically happens when the function involves 
-randomness, external state, or time-dependent behavior. For example, a function that returns a random number between \(-0.02\) and \(0.02\) will produce 
-different results on each call, even when provided with the same input.
+A function is deterministic if it always produces the same output for the same input. Non-deterministic functions may produce different outputs 
+for the same input due to randomness, external state, or time-dependent behavior.
 
 In our implementation, the behavior of the functions falls into two categories:
 
@@ -216,7 +194,7 @@ In our implementation, the behavior of the functions falls into two categories:
       \end{verbatim}
       yields event timings that change from cycle to cycle in a non-predictable manner.
     \end{itemize}
-
+    \hide{
     \textbf{Summary Examples:}
     \begin{enumerate}
       \item With \texttt{myModifyTime}, if the transformation is \texttt{(+0.1)}, every event is delayed by exactly 0.1 cycles:
@@ -234,7 +212,7 @@ In our implementation, the behavior of the functions falls into two categories:
       \]
       Here, the maximum jitter value changes according to a sine wave, and the random offset applied is within the current bound. Although 
       the \texttt{range} pattern is deterministic, the resulting event shifts are non-deterministic due to the randomness in offset selection.
-    \end{enumerate}
+    \end{enumerate}}
 \end{itemize}
 
 In conclusion, while \texttt{myModifyTime} deterministically applies a specified transformation to event timings, the higher-level 
