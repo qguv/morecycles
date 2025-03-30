@@ -27,52 +27,52 @@ The Double parameter specifies how early the grace note starts
 gracenotes' :: Time -> Pattern Bool -> Pattern a -> Pattern a
 gracenotes' offset mp p = stack [original, graceNotes] where
   original = p
-  -- Get all events from the original pattern for a given state
-  getOriginalEvents state = query p state
   -- Create grace notes for events that match the mask
   graceNotes = Pattern{query=newQuery}
   newQuery state =
     let 
       -- Get events that match the mask
       maskedEvents = query (mask mp p) state
-      -- Get all events from the original pattern
-      allEvents = getOriginalEvents state
-      -- If there are no events, return empty list
-      result = if null maskedEvents || null allEvents
-               then []
-               else
-                 let
-                   -- Sort all events by start time to establish sequence
-                   sortedEvents = sortBy (\e1 e2 -> compare (start $ part e1) (start $ part e2)) allEvents
-                   -- Create a circular list of values from the original pattern
-                   originalValues = cycle $ map value sortedEvents
-                   -- For each masked event, find its position in the original sequence
-                   -- and get the next value from the original sequence
-                   createGraceNotes e =
-                     let
-                       eTime = start $ part e
-                       -- Find the index of this event in the sorted sequence
-                       -- (or the closest one if exact match not found)
-                       findNextIndex [] _ = 0
-                       findNextIndex [_] _ = 0
-                       findNextIndex (x:xs) t =
-                         if abs (start (part x) - t) < 0.0001
-                         then 0  -- Found the event
-                         else 1 + findNextIndex xs t
-                       eventIndex = findNextIndex sortedEvents eTime
-                       -- Get the next value in the original sequence (wrapping if needed)
-                       nextValue = originalValues !! (eventIndex + 1)
-                       -- Create the grace note
-                       t0 = start $ part e
-                      --  graceStart = if t0 - offset < 0 then 1 + (t0 - offset) else t0 - offset
-                      --  graceEnd = graceStart + offset
-                       graceStart = t0 - offset
-                       graceEnd = t0
-                       gracePart = Arc graceStart graceEnd
-                       graceEvent = e {part = gracePart, whole=Just gracePart, value = nextValue}
-                     in graceEvent
-                 in map createGraceNotes maskedEvents
-    in result
+      
+      -- Get the pattern for a single cycle - this is our reference pattern
+      referenceState = State {arc = Arc 0 1, controls = controls state}
+      referenceCycle = query p referenceState
+      
+      -- Sort reference events by start time to establish sequence
+      sortedReference = sortBy (\e1 e2 -> compare (cyclePos $ start $ part e1) (cyclePos $ start $ part e2)) referenceCycle
+      
+      -- Create a circular list of values from the reference pattern
+      referenceValues = cycle $ map value sortedReference
+      
+      -- For each masked event, find its position in the cycle and get the next value
+      createGraceNote e =
+        let
+          -- Get normalized position in cycle (0-1)
+          cyclePosTime = cyclePos $ start $ part e
+          
+          -- Find the closest event in the reference cycle
+          findPosition [] _ = 0
+          findPosition [_] _ = 0
+          findPosition (x:xs) t =
+            if abs (cyclePos (start (part x)) - t) < 0.0001
+            then 0  -- Found the event
+            else 1 + findPosition xs t
+          
+          eventIndex = findPosition sortedReference cyclePosTime
+          
+          -- Get next value, respecting the cycle structure
+          nextValue = referenceValues !! (eventIndex + 1)
+          
+          -- Create the grace note
+          t0 = start $ part e
+          graceStart = t0 - offset
+          graceEnd = t0
+          gracePart = Arc graceStart graceEnd
+          graceEvent = e {part = gracePart, whole=Just gracePart, value = nextValue}
+        in 
+          graceEvent
+    in
+      map createGraceNote maskedEvents
 
 
 -- | A simpler version of gracenotes that automatically generates a random Boolean pattern
