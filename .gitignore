@@ -28,3 +28,5 @@ dist
 dist-*
 *.cabal
 .vscode/
+jumble-haskell.hs
+jumbletests.lhs

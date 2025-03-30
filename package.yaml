@@ -31,3 +31,13 @@ tests:
       - QuickCheck
       - hspec
       - tidal
+
+  jittertests:
+    main: jittertests.lhs
+    source-dirs: test
+    dependencies:
+      - morecycles
+      - QuickCheck
+      - hspec
+      - tidal
+      - random
